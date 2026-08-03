@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
+
+            $table->string('kode_spt')->default('090');
+            $table->string('nama_opd')->default('DISKOMINFOSAN-BLG');
+
             $table->timestamps();
         });
     }

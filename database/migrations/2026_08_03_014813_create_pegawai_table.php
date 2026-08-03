@@ -19,8 +19,20 @@ return new class extends Migration
             $table->string('pangkat');
             $table->string('golongan');
             $table->string('jabatan');
+
+            $table->enum('kode_sppd', [
+                '097.2',
+                '097.3',
+                '097.4',
+                '097.5',
+            ]);
+
             $table->string('unit_kerja');
-            $table->enum('status', ['ASN', 'Non ASN'])->default('ASN');
+
+            $table->enum('status', [
+                'ASN',
+                'Non ASN',
+            ])->default('ASN');
 
             $table->timestamps();
         });

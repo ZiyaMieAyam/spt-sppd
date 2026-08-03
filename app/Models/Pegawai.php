@@ -12,6 +12,7 @@ class Pegawai extends Model
         'pangkat',
         'golongan',
         'jabatan',
+        'kode_sppd',
         'unit_kerja',
         'status',
     ];

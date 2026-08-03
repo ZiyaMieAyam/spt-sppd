@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\Pegawais\Tables;
 
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -27,12 +27,20 @@ class PegawaisTable
                     ->sortable(),
 
                 TextColumn::make('jabatan')
+                    ->label('Jabatan')
                     ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('kode_sppd')
+                    ->label('Kode SPPD')
+                    ->badge()
+                    ->color('info')
                     ->sortable(),
 
                 TextColumn::make('unit_kerja')
                     ->label('Unit Kerja')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
 
                 TextColumn::make('status')
                     ->badge()
@@ -44,7 +52,7 @@ class PegawaisTable
 
                 TextColumn::make('created_at')
                     ->label('Dibuat')
-                    ->dateTime('d M Y')
+                    ->date('d M Y')
                     ->sortable(),
             ])
             ->filters([
@@ -52,6 +60,15 @@ class PegawaisTable
                     ->options([
                         'ASN' => 'ASN',
                         'Non ASN' => 'Non ASN',
+                    ]),
+
+                SelectFilter::make('kode_sppd')
+                    ->label('Kode SPPD')
+                    ->options([
+                        '097.2' => '097.2',
+                        '097.3' => '097.3',
+                        '097.4' => '097.4',
+                        '097.5' => '097.5',
                     ]),
             ])
             ->recordActions([

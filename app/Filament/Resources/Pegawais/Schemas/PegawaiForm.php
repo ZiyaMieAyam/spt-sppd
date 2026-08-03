@@ -25,16 +25,30 @@ class PegawaiForm
                     ->maxLength(255),
 
                 TextInput::make('pangkat')
+                    ->label('Pangkat')
                     ->required()
                     ->maxLength(255),
 
                 TextInput::make('golongan')
+                    ->label('Golongan')
                     ->required()
                     ->maxLength(255),
 
                 TextInput::make('jabatan')
+                    ->label('Jabatan')
                     ->required()
                     ->maxLength(255),
+
+                Select::make('kode_sppd')
+                    ->label('Kode SPPD')
+                    ->options([
+                        '097.2' => '097.2 - Eselon I (Kepala Dinas)',
+                        '097.3' => '097.3 - Eselon II (Sekretaris / Kabid)',
+                        '097.4' => '097.4 - Eselon III (Kasi / Kasubbag)',
+                        '097.5' => '097.5 - Staf',
+                    ])
+                    ->required()
+                    ->native(false),
 
                 TextInput::make('unit_kerja')
                     ->label('Unit Kerja')
@@ -42,6 +56,7 @@ class PegawaiForm
                     ->maxLength(255),
 
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'ASN' => 'ASN',
                         'Non ASN' => 'Non ASN',

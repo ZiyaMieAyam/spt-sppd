@@ -26,6 +26,8 @@ class PegawaiResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pegawai';
 
+    protected static ?string $modelLabel = 'Pegawai';
+
     public static function form(Schema $schema): Schema
     {
         return PegawaiForm::configure($schema);
