@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class KotaTujuan extends Model
 {
-    protected $table = 'kota_tujuan';
+    protected $table = 'kota_tujuans';
 
     protected $fillable = [
         'nama',
     ];
+
+    public function spts()
+    {
+        return $this->hasMany(Spt::class);
+    }
 }

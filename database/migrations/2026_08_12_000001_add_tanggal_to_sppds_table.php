@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kota_tujuan', function (Blueprint $table) {
-            $table->id();
-
-            $table->string('nama')->unique();
-
-            $table->timestamps();
+        Schema::table('sppds', function (Blueprint $table) {
+            $table->date('tanggal_berangkat')->nullable();
+            $table->date('tanggal_kembali')->nullable();
         });
     }
 
@@ -25,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kota_tujuan');
+        Schema::table('sppds', function (Blueprint $table) {
+            $table->dropColumn(['tanggal_berangkat', 'tanggal_kembali']);
+        });
     }
 };

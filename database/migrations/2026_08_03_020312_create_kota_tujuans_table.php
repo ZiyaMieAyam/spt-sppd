@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('kota_tujuans', function (Blueprint $table) {
             $table->id();
+
+            $table->string('nama')->unique();
+
             $table->timestamps();
         });
     }

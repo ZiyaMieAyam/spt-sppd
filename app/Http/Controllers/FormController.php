@@ -1,0 +1,223 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Kecamatan;
+use App\Models\KotaTujuan;
+use App\Models\Pegawai;
+use App\Models\Sppd;
+use App\Models\Spt;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+
+class FormController extends Controller
+{
+    public function create()
+    {
+        return view('form', [
+            'pegawais' => Pegawai::orderBy('nama')->get(),
+            'kecamatans' => Kecamatan::orderBy('nama')->get(),
+            'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
+            'selectedPegawaiIds' => [],
+            'editMode' => false,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $this->validatedData($request);
+
+        DB::transaction(function () use ($validated) {
+            $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
+
+            $spt = Spt::create([
+                'jenis_perjalanan' => $validated['jenis_perjalanan'],
+                'nomor_spt' => Spt::generateNomorSpt($tanggalSpt),
+                'tanggal_spt' => $validated['tanggal_spt'],
+                'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                'tanggal_kembali' => $validated['tanggal_kembali'],
+                'perihal' => $validated['perihal'],
+                'kecamatan_id' => $this->kecamatanId($validated),
+                'desa' => $this->desa($validated),
+                'kota_tujuan_id' => $this->kotaTujuanId($validated),
+            ]);
+
+            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+
+            foreach ($validated['pegawai_ids'] as $pegawaiId) {
+                $pegawai = Pegawai::findOrFail($pegawaiId);
+
+                Sppd::create([
+                    'spt_id' => $spt->id,
+                    'pegawai_id' => $pegawai->id,
+                    'nomor_sppd' => Sppd::formatNomorSppd(
+                        $pegawai->kode_sppd,
+                        $urutan,
+                        $tanggalSpt
+                    ),
+                    'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                    'tanggal_kembali' => $validated['tanggal_kembali'],
+                ]);
+
+                $urutan++;
+            }
+        });
+
+        return redirect()
+            ->route($this->routeTujuan($validated['jenis_perjalanan']))
+            ->with('success', 'Data perjalanan dinas berhasil disimpan.');
+    }
+
+    public function edit(Sppd $sppd)
+    {
+        $spt = $sppd->spt;
+
+        return view('form', [
+            'sppd' => $sppd,
+            'spt' => $spt,
+            'pegawais' => Pegawai::orderBy('nama')->get(),
+            'kecamatans' => Kecamatan::orderBy('nama')->get(),
+            'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
+            'selectedPegawaiIds' => $spt
+                ? $spt->sppds()->pluck('pegawai_id')->toArray()
+                : [],
+            'editMode' => true,
+        ]);
+    }
+
+    public function update(Request $request, Sppd $sppd)
+    {
+        $validated = $this->validatedData($request);
+
+        DB::transaction(function () use ($validated, $sppd) {
+            $spt = $sppd->spt;
+
+            if (! $spt) {
+                throw ValidationException::withMessages([
+                    'spt' => 'SPT terkait tidak ditemukan.',
+                ]);
+            }
+
+            $spt->update([
+                'jenis_perjalanan' => $validated['jenis_perjalanan'],
+                'tanggal_spt' => $validated['tanggal_spt'],
+                'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                'tanggal_kembali' => $validated['tanggal_kembali'],
+                'perihal' => $validated['perihal'],
+                'kecamatan_id' => $this->kecamatanId($validated),
+                'desa' => $this->desa($validated),
+                'kota_tujuan_id' => $this->kotaTujuanId($validated),
+            ]);
+
+            $spt->sppds()->delete();
+
+            $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
+            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+
+            foreach ($validated['pegawai_ids'] as $pegawaiId) {
+                $pegawai = Pegawai::findOrFail($pegawaiId);
+
+                Sppd::create([
+                    'spt_id' => $spt->id,
+                    'pegawai_id' => $pegawai->id,
+                    'nomor_sppd' => Sppd::formatNomorSppd(
+                        $pegawai->kode_sppd,
+                        $urutan,
+                        $tanggalSpt
+                    ),
+                    'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                    'tanggal_kembali' => $validated['tanggal_kembali'],
+                ]);
+
+                $urutan++;
+            }
+        });
+
+        return redirect()
+            ->route($this->routeTujuan($validated['jenis_perjalanan']))
+            ->with('success', 'Data berhasil diperbarui.');
+    }
+
+    public function destroy(Sppd $sppd)
+    {
+        DB::transaction(function () use ($sppd) {
+            $spt = $sppd->spt;
+
+            if ($spt) {
+                $spt->sppds()->delete();
+                $spt->delete();
+            } else {
+                $sppd->delete();
+            }
+        });
+
+        return back()->with('success', 'Data berhasil dihapus.');
+    }
+
+    protected function validatedData(Request $request): array
+    {
+        $dalamDaerah = $request->input('jenis_perjalanan') === 'Dalam Daerah';
+        $luarDaerah = $request->input('jenis_perjalanan') === 'Luar Daerah';
+
+        return $request->validate([
+            'jenis_perjalanan' => ['required', 'in:Dalam Daerah,Luar Daerah'],
+            'tanggal_spt' => ['required', 'date'],
+            'tanggal_berangkat' => ['required', 'date'],
+            'tanggal_kembali' => ['required', 'date', 'after_or_equal:tanggal_berangkat'],
+            'perihal' => ['required', 'string'],
+            'pegawai_ids' => ['required', 'array', 'min:1'],
+            'pegawai_ids.*' => ['exists:pegawais,id'],
+            'kecamatan_id' => [
+                'nullable',
+                'exists:kecamatans,id',
+                Rule::requiredIf($dalamDaerah),
+            ],
+            'desa' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::requiredIf($dalamDaerah),
+            ],
+            'kota_tujuan_id' => [
+                'nullable',
+                'exists:kota_tujuans,id',
+                Rule::requiredIf($luarDaerah),
+            ],
+        ], [
+            'pegawai_ids.required' => 'Pilih minimal satu pegawai yang ditugaskan.',
+            'pegawai_ids.min' => 'Pilih minimal satu pegawai yang ditugaskan.',
+            'kecamatan_id.required' => 'Kecamatan wajib dipilih untuk perjalanan dalam daerah.',
+            'desa.required' => 'Desa wajib diisi untuk perjalanan dalam daerah.',
+            'kota_tujuan_id.required' => 'Kota tujuan wajib dipilih untuk perjalanan luar daerah.',
+        ]);
+    }
+
+    protected function kecamatanId(array $validated): ?int
+    {
+        return $validated['jenis_perjalanan'] === 'Dalam Daerah'
+            ? $validated['kecamatan_id']
+            : null;
+    }
+
+    protected function desa(array $validated): ?string
+    {
+        return $validated['jenis_perjalanan'] === 'Dalam Daerah'
+            ? $validated['desa']
+            : null;
+    }
+
+    protected function kotaTujuanId(array $validated): ?int
+    {
+        return $validated['jenis_perjalanan'] === 'Luar Daerah'
+            ? $validated['kota_tujuan_id']
+            : null;
+    }
+
+    protected function routeTujuan(string $jenis): string
+    {
+        return $jenis === 'Dalam Daerah' ? 'dalam-daerah' : 'luar-daerah';
+    }
+}

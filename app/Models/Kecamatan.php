@@ -9,4 +9,9 @@ class Kecamatan extends Model
     protected $fillable = [
         'nama',
     ];
+
+    public function spts()
+    {
+        return $this->hasMany(Spt::class);
+    }
 }

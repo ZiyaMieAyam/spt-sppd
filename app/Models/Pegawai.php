@@ -16,4 +16,19 @@ class Pegawai extends Model
         'unit_kerja',
         'status',
     ];
-}
+
+    public function sppds()
+    {
+        return $this->hasMany(Sppd::class);
+    }
+
+    public function spts()
+    {
+        return $this->belongsToMany(
+            Spt::class,
+            'sppds',
+            'pegawai_id',
+            'spt_id'
+        );
+    }
+}   
