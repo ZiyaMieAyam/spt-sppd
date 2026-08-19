@@ -6,7 +6,9 @@ use App\Filament\Resources\Spts\SptResource;
 use App\Models\Pegawai;
 use App\Models\Sppd;
 use App\Models\Spt;
+use Carbon\Carbon;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\DB;
 
 class CreateSpt extends CreateRecord
 {
@@ -20,26 +22,39 @@ class CreateSpt extends CreateRecord
 
         unset($data['pegawais']);
 
-        $data['nomor_spt'] = Spt::generateNomorSpt();
+        $tanggalSpt = Carbon::parse($data['tanggal_spt']);
+        $data['nomor_spt'] = Spt::generateNomorSpt($tanggalSpt);
 
         return $data;
     }
 
     protected function afterCreate(): void
     {
-        foreach ($this->pegawaiIds as $pegawaiId) {
+        DB::transaction(function () {
+            $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
+            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
 
-            $pegawai = Pegawai::find($pegawaiId);
+            foreach ($this->pegawaiIds as $pegawaiId) {
+                $pegawai = Pegawai::find($pegawaiId);
 
-            if (! $pegawai) {
-                continue;
+                if (! $pegawai) {
+                    continue;
+                }
+
+                Sppd::create([
+                    'spt_id' => $this->record->id,
+                    'pegawai_id' => $pegawai->id,
+                    'nomor_sppd' => Sppd::formatNomorSppd(
+                        $pegawai->kode_sppd,
+                        $urutan,
+                        $tanggalSpt
+                    ),
+                    'tanggal_berangkat' => $this->record->tanggal_berangkat,
+                    'tanggal_kembali' => $this->record->tanggal_kembali,
+                ]);
+
+                $urutan++;
             }
-
-            Sppd::create([
-                'spt_id'      => $this->record->id,
-                'pegawai_id'  => $pegawai->id,
-                'nomor_sppd'  => Sppd::generateNomorSppd($pegawai->kode_sppd),
-            ]);
-        }
+        });
     }
 }

@@ -14,6 +14,10 @@ class SppdsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort(fn ($query) => $query
+                ->orderBy('spt_id', 'asc')
+                ->orderBy('id', 'asc')
+            )
             ->columns([
 
                 TextColumn::make('nomor_sppd')

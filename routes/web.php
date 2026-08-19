@@ -45,7 +45,8 @@ Route::middleware('auth')->group(function () {
                 'Dalam Daerah'
             );
         })
-        ->latest()
+        ->orderBy('spt_id', 'asc')
+        ->orderBy('id', 'asc')
         ->get();
 
         return view('dalam-daerah', [
@@ -67,7 +68,8 @@ Route::middleware('auth')->group(function () {
                 'Luar Daerah'
             );
         })
-        ->latest()
+        ->orderBy('spt_id', 'asc')
+        ->orderBy('id', 'asc')
         ->get();
 
         return view('luar-daerah', [
@@ -112,13 +114,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/cek-data', function () {
 
         return view('cek-data', [
-            'spts' => Spt::latest()->get(),
+            'spts' => Spt::orderBy('id', 'asc')->get(),
 
             'sppds' => Sppd::with([
                 'spt',
                 'pegawai',
             ])
-            ->latest()
+            ->orderBy('spt_id', 'asc')
+            ->orderBy('id', 'asc')
             ->get(),
         ]);
 

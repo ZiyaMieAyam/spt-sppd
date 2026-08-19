@@ -14,7 +14,7 @@ class SptsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->defaultSort('tanggal_spt', 'desc')
+            ->defaultSort('id', 'asc')
             ->columns([
 
                 TextColumn::make('nomor_spt')
