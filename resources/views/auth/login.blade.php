@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login - SPT SPPD</title>
+    <title>Login - SiPerjadin</title>
 
     <style>
         * {
@@ -138,10 +138,10 @@
 
         <div class="title">
 
-            <h1>SPT & SPPD</h1>
+            <h1>SiPerjadin</h1>
 
             <p>
-                Sistem Pengelolaan Surat Perintah Tugas
+                Sistem Perjalanan Dinas
             </p>
 
         </div>

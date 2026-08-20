@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Spt;
 use App\Models\Sppd;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormController;
@@ -93,40 +92,26 @@ Route::middleware('auth')->group(function () {
     ])->name('form.simpan');
 
 
-    Route::get('/form/{sppd}/edit', [
-        FormController::class,
-        'edit',
-    ])->name('form.edit');
+    Route::middleware('role:admin')->group(function () {
+
+        Route::get('/form/{sppd}/edit', [
+            FormController::class,
+            'edit',
+        ])->name('form.edit');
 
 
-    Route::put('/form/{sppd}', [
-        FormController::class,
-        'update',
-    ])->name('form.update');
+        Route::put('/form/{sppd}', [
+            FormController::class,
+            'update',
+        ])->name('form.update');
 
 
-    Route::delete('/form/{sppd}', [
-        FormController::class,
-        'destroy',
-    ])->name('form.delete');
+        Route::delete('/form/{sppd}', [
+            FormController::class,
+            'destroy',
+        ])->name('form.delete');
 
-
-    Route::get('/cek-data', function () {
-
-        return view('cek-data', [
-            'spts' => Spt::orderBy('id', 'asc')->get(),
-
-            'sppds' => Sppd::with([
-                'spt',
-                'pegawai',
-            ])
-            ->orderBy('spt_id', 'asc')
-            ->orderBy('id', 'asc')
-            ->get(),
-        ]);
-
-    })->name('cek-data');
-
+    });
 
     Route::get('/admin/spts/{spt}/pdf', [
         SptPdfController::class,

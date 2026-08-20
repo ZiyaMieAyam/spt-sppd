@@ -13,6 +13,7 @@ class UserSeeder extends Seeder
             ['email' => 'zia@zia.com'],
             [
                 'name' => 'zia',
+                'role' => 'user',
                 'password' => '12345',
             ]
         );
@@ -21,6 +22,7 @@ class UserSeeder extends Seeder
             ['email' => 'kepegawaian@diskominfo.balangankab.go.id'],
             [
                 'name' => 'Bidang Kepegawaian',
+                'role' => 'user',
                 'password' => 'pegawai12345',
             ]
         );
@@ -29,6 +31,7 @@ class UserSeeder extends Seeder
             ['email' => 'sekretariat@diskominfo.balangankab.go.id'],
             [
                 'name' => 'Sekretariat',
+                'role' => 'user',
                 'password' => 'sekretariat12345',
             ]
         );
@@ -37,6 +40,7 @@ class UserSeeder extends Seeder
             ['email' => 'perencanaan@diskominfo.balangankab.go.id'],
             [
                 'name' => 'Bidang Perencanaan',
+                'role' => 'user',
                 'password' => 'perencanaan12345',
             ]
         );
@@ -45,6 +49,7 @@ class UserSeeder extends Seeder
             ['email' => 'diskominfosan@balangankab.go.id'],
             [
                 'name' => 'Diskominfosan',
+                'role' => 'user',
                 'password' => 'diskominfo12345',
             ]
         );

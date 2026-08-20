@@ -379,11 +379,11 @@ class SptSppdIntegrationTest extends TestCase
 
         $sptId = $spt->id;
 
-        // User melihat data yang sama — cek via cek-data (menampilkan perihal)
+        // User melihat data yang sama — cek via dalam-daerah
         $this->actingAs(User::firstOrFail())
-            ->get(route('cek-data'))
+            ->get(route('dalam-daerah'))
             ->assertOk()
-            ->assertSee('Admin membuat ini');
+            ->assertSee('Desa Admin');
 
         // Admin mengedit — gunakan DB query langsung untuk memastikan persist
         \Illuminate\Support\Facades\DB::table('spts')
@@ -400,9 +400,8 @@ class SptSppdIntegrationTest extends TestCase
 
         // User melihat perubahan yang sama
         $this->actingAs(User::firstOrFail())
-            ->get(route('cek-data'))
+            ->get(route('dalam-daerah'))
             ->assertOk()
-            ->assertSee('Admin mengubah ini')
             ->assertSee('Desa Baru');
 
         // Admin menghapus
@@ -411,9 +410,9 @@ class SptSppdIntegrationTest extends TestCase
 
         // User tidak melihat data lagi
         $this->actingAs(User::firstOrFail())
-            ->get(route('cek-data'))
+            ->get(route('dalam-daerah'))
             ->assertOk()
-            ->assertDontSee('Admin mengubah ini');
+            ->assertDontSee('Desa Baru');
 
         $this->assertNull(Spt::find($sptId));
         $this->assertSame(0, Sppd::where('spt_id', $sptId)->count());

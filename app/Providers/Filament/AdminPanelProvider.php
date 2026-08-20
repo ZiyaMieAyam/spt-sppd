@@ -28,6 +28,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('SiPerjadin')
+            ->brandLogo(asset('images/logo-balangan.png'))
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -54,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                'role:admin',
             ]);
     }
 }

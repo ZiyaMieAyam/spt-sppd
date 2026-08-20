@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', ! empty($editMode) ? 'Edit SPT & SPPD' : 'Form SPT & SPPD')
+@section('title', ! empty($editMode) ? 'Edit SPT & SPPD - SiPerjadin' : 'Form SPT & SPPD - SiPerjadin')
 
 @section('content')
 

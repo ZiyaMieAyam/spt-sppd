@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dalam Daerah - SPT & SPPD')
+@section('title', 'Dalam Daerah - SiPerjadin')
 
 @section('content')
 
@@ -25,14 +25,13 @@
 
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th class="col-no">No</th>
                         <th>Nomor SPT</th>
                         <th>Nomor SPPD</th>
                         <th>Nama Pegawai</th>
                         <th>Tujuan</th>
                         <th>Tanggal Berangkat</th>
                         <th>Tanggal Kembali</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
 
@@ -42,7 +41,7 @@
 
                         <tr>
 
-                            <td>
+                            <td class="col-no">
                                 {{ $index + 1 }}
                             </td>
 
@@ -74,40 +73,12 @@
                                 {{ $item->tanggal_kembali?->translatedFormat('d M Y') ?? '-' }}
                             </td>
 
-                            <td>
-
-                                <div class="row-actions">
-
-                                    <a
-                                        href="{{ route('form.edit', $item) }}"
-                                        class="btn-edit"
-                                    >
-                                        Edit
-                                    </a>
-
-                                    <form
-                                        action="{{ route('form.delete', $item) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Hapus data perjalanan ini beserta SPPD terkait?');"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit" class="btn-danger">
-                                            Hapus
-                                        </button>
-                                    </form>
-
-                                </div>
-
-                            </td>
-
                         </tr>
 
                     @empty
 
                         <tr>
-                            <td colspan="8" class="empty">
+                            <td colspan="7" class="empty">
                                 Belum ada data perjalanan dinas dalam daerah.
                             </td>
                         </tr>
@@ -150,7 +121,6 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 850px;
     }
 
     th {
@@ -168,6 +138,15 @@
         font-size: 13px;
         border-bottom: 1px solid #f3f4f6;
         white-space: nowrap;
+    }
+
+    .col-no {
+        width: 50px;
+        text-align: center;
+    }
+
+    tbody tr {
+        transition: background 0.15s ease;
     }
 
     tbody tr:hover {
@@ -188,46 +167,6 @@
         padding: 12px 16px;
         font-size: 13px;
         margin-bottom: 18px;
-    }
-
-    .row-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .row-actions form {
-        margin: 0;
-    }
-
-    .btn-edit,
-    .btn-danger {
-        display: inline-block;
-        border: none;
-        border-radius: 6px;
-        padding: 7px 13px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-    }
-
-    .btn-edit {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .btn-edit:hover {
-        background: #bfdbfe;
-    }
-
-    .btn-danger {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-    .btn-danger:hover {
-        background: #fecaca;
     }
 
     td small {

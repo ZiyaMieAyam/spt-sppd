@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'SPT & SPPD')</title>
+    <title>@yield('title', 'SiPerjadin')</title>
 
     <style>
         * {
@@ -27,16 +27,15 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 35px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
 
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #111827;
             text-decoration: none;
+            color: #111827;
         }
 
         .navbar-brand img {
@@ -45,20 +44,53 @@
             object-fit: contain;
         }
 
+        .navbar-brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .navbar-brand-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .navbar-brand-sub {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 400;
+        }
+
         .navbar-menu {
             display: flex;
             align-items: center;
-            gap: 25px;
+            gap: 6px;
         }
 
         .navbar-menu a {
             text-decoration: none;
             color: #4b5563;
             font-size: 14px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.15s ease, color 0.15s ease;
         }
 
         .navbar-menu a:hover {
+            background: #f3f4f6;
             color: #2563eb;
+        }
+
+        .navbar-admin {
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .navbar-admin:hover {
+            background: #fde68a;
+            color: #92400e;
         }
 
         .logout-button {
@@ -67,7 +99,13 @@
             color: #dc2626;
             font-size: 14px;
             cursor: pointer;
-            padding: 0;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: background 0.15s ease;
+        }
+
+        .logout-button:hover {
+            background: #fef2f2;
         }
 
         .main {
@@ -99,19 +137,34 @@
 
         @media (max-width: 700px) {
             .navbar {
-                padding: 0 20px;
+                padding: 0 16px;
+            }
+
+            .navbar-brand-sub {
+                display: none;
             }
 
             .navbar-menu {
-                gap: 12px;
+                gap: 2px;
             }
 
             .navbar-menu a {
                 font-size: 12px;
+                padding: 6px 8px;
+            }
+
+            .navbar-admin {
+                font-size: 12px;
+                padding: 6px 8px;
+            }
+
+            .logout-button {
+                font-size: 12px;
+                padding: 6px 8px;
             }
 
             .main {
-                padding: 20px;
+                padding: 16px;
             }
         }
     </style>
@@ -130,7 +183,10 @@
                 alt="Logo Kabupaten Balangan"
             >
 
-            <span>SPT & SPPD</span>
+            <div class="navbar-brand-text">
+                <span class="navbar-brand-name">SiPerjadin</span>
+                <span class="navbar-brand-sub">Sistem Perjalanan Dinas</span>
+            </div>
 
         </a>
 
@@ -141,6 +197,10 @@
                 Beranda
             </a>
 
+            <a href="{{ route('form') }}">
+                Form
+            </a>
+
             <a href="{{ route('dalam-daerah') }}">
                 Dalam Daerah
             </a>
@@ -149,9 +209,13 @@
                 Luar Daerah
             </a>
 
-            <a href="{{ route('form') }}">
-                Form
+            @if(auth()->user()->isAdmin())
+
+            <a href="{{ url('/admin') }}" target="_blank" class="navbar-admin">
+                Admin Panel
             </a>
+
+            @endif
 
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
