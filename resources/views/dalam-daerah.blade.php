@@ -32,6 +32,7 @@
                         <th>Tujuan</th>
                         <th>Tanggal Berangkat</th>
                         <th>Tanggal Kembali</th>
+                        <th class="col-aksi">Aksi</th>
                     </tr>
                 </thead>
 
@@ -73,12 +74,42 @@
                                 {{ $item->tanggal_kembali?->translatedFormat('d M Y') ?? '-' }}
                             </td>
 
+                            <td class="col-aksi">
+
+                                <div class="aksi-grup">
+
+                                    @if($item->spt)
+
+                                        <a href="{{ route('spts.pdf.pilih', $item->spt->id) }}" target="_blank" class="btn-print" title="Cetak PDF SPT">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M6 9V2h12v7"/>
+                                                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                                <rect x="6" y="14" width="12" height="8"/>
+                                            </svg>
+                                            Cetak SPT
+                                        </a>
+
+                                    @endif
+
+                                    <a href="{{ route('sppds.pdf', $item->id) }}" target="_blank" class="btn-print btn-sppd" title="Cetak PDF SPPD">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6 9V2h12v7"/>
+                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                            <rect x="6" y="14" width="12" height="8"/>
+                                        </svg>
+                                        Cetak SPPD
+                                    </a>
+
+                                </div>
+
+                            </td>
+
                         </tr>
 
                     @empty
 
                         <tr>
-                            <td colspan="7" class="empty">
+                            <td colspan="8" class="empty">
                                 Belum ada data perjalanan dinas dalam daerah.
                             </td>
                         </tr>
@@ -171,6 +202,49 @@
 
     td small {
         color: #6b7280;
+    }
+
+    .col-aksi {
+        width: 1%;
+        white-space: nowrap;
+        text-align: right;
+    }
+
+    .btn-print {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #2563eb;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 8px;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-print:hover {
+        background: #dbeafe;
+        border-color: #93c5fd;
+    }
+
+    .aksi-grup {
+        display: inline-flex;
+        gap: 8px;
+    }
+
+    .btn-sppd {
+        color: #15803d;
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+    }
+
+    .btn-sppd:hover {
+        background: #dcfce7;
+        border-color: #86efac;
     }
 
 </style>

@@ -2,8 +2,10 @@
 
 use App\Models\Sppd;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\SptPdfController;
+use App\Http\Controllers\SppdPdfController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -27,9 +29,10 @@ Route::post('/logout', [
 
 Route::middleware('auth')->group(function () {
 
-    Route::get('/', function () {
-        return view('beranda');
-    })->name('beranda');
+    Route::get('/', [
+        BerandaController::class,
+        'index',
+    ])->name('beranda');
 
 
     Route::get('/dalam-daerah', function () {
@@ -113,9 +116,21 @@ Route::middleware('auth')->group(function () {
 
     });
 
+    Route::get('/admin/spts/{spt}/pdf/pilih', [
+        SptPdfController::class,
+        'pilih',
+    ])->name('spts.pdf.pilih');
+
+
     Route::get('/admin/spts/{spt}/pdf', [
         SptPdfController::class,
         'generate',
     ])->name('spts.pdf');
+
+
+    Route::get('/sppds/{sppd}/pdf', [
+        SppdPdfController::class,
+        'show',
+    ])->name('sppds.pdf');
 
 });
