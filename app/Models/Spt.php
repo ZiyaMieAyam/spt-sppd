@@ -14,6 +14,7 @@ class Spt extends Model
         'tanggal_berangkat',
         'tanggal_kembali',
         'perihal',
+        'dasar',
         'kecamatan_id',
         'desa',
         'kota_tujuan_id',

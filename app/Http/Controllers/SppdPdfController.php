@@ -3,43 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sppd;
-use App\Services\PenandatanganService;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class SppdPdfController extends Controller
 {
-    public function show(Request $request, Sppd $sppd)
+    public function show(Sppd $sppd)
     {
-        $kunci = $request->query('penandatangan');
-
-        $definisi = is_string($kunci) && $kunci !== ''
-            ? PenandatanganService::cari($kunci)
-            : null;
-
-        if ($definisi === null) {
-            return redirect()
-                ->route('spts.pdf.pilih', [
-                    'spt' => $sppd->spt_id,
-                    'sppd' => $sppd->id,
-                ])
-                ->with('error', 'Silakan pilih penandatangan terlebih dahulu.');
-        }
-
         $sppd->load([
             'pegawai',
             'spt.kecamatan',
             'spt.kotaTujuan',
         ]);
 
-        if (!PenandatanganService::valid($kunci, [$sppd->pegawai])) {
-            return redirect()
-                ->route('spts.pdf.pilih', [
-                    'spt' => $sppd->spt_id,
-                    'sppd' => $sppd->id,
-                ])
-                ->with('error', 'Penandatangan tersebut tidak diizinkan untuk jabatan pegawai yang ditugaskan.');
-        }
+        $penandatangan = Config::get('pejabat-sementara.kepala_dinas', [
+            'nama' => null,
+            'nip' => null,
+            'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
+        ]);
 
         $lamaHari = null;
 
@@ -47,16 +28,14 @@ class SppdPdfController extends Controller
             $lamaHari = (int) $sppd->tanggal_berangkat->diffInDays($sppd->tanggal_kembali) + 1;
         }
 
-        $pathKop = PenandatanganService::pathKop((string) $definisi['kop']);
-
         $pdf = Pdf::loadView('pdf.sppd', [
             'sppd' => $sppd,
             'spt' => $sppd->spt,
             'pegawai' => $sppd->pegawai,
             'lamaHari' => $lamaHari,
-            'penandatangan' => $definisi,
-            'pathKop' => $pathKop,
-            'adaGambarKop' => $pathKop !== '' && is_file($pathKop),
+            'penandatangan' => $penandatangan,
+            'pathKop' => '',
+            'adaGambarKop' => false,
         ]);
 
         $pdf->setPaper('A4', 'portrait');

@@ -43,6 +43,12 @@ class SptForm
                     ->required()
                     ->columnSpanFull(),
 
+                Textarea::make('dasar')
+                    ->label('Dasar')
+                    ->rows(3)
+                    ->placeholder("Contoh:\n1. Peraturan Bupati Balangan Nomor ... Tahun ...\n2. Keputusan Bupati Balangan Nomor ... Tahun ...")
+                    ->columnSpanFull(),
+
                 Select::make('kecamatan_id')
                     ->label('Kecamatan')
                     ->relationship('kecamatan', 'nama')

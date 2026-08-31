@@ -73,6 +73,49 @@
         line-height: 1.3;
     }
 
+    .kop-bupati {
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .kop-bupati-garuda {
+        display: block;
+        width: 75px;
+        height: auto;
+        margin: 0 auto 6px;
+    }
+
+    .kop-bupati-teks {
+        font-size: 16pt;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .kop-sekda {
+        text-align: center;
+        padding: 5px 0;
+    }
+
+    .kop-sekda-pemda {
+        font-size: 14pt;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+
+    .kop-sekda-dinas {
+        font-size: 14pt;
+        font-weight: bold;
+        line-height: 1.2;
+        margin-top: 2px;
+    }
+
+    .kop-sekda-kab {
+        font-size: 14pt;
+        font-weight: bold;
+        line-height: 1.2;
+        margin-top: 2px;
+    }
+
     .judul {
         text-align: center;
         margin-top: 8px;

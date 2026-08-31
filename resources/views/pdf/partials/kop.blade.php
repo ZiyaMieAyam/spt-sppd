@@ -1,63 +1,139 @@
-@php($logoFallbackPath = public_path('images/logo-balangan.png'))
+@php
+    $jenisKop = $penandatangan['kop'] ?? 'diskominfo';
+    $garudaPath = public_path('images/garuda.png');
+    $logoFallbackPath = public_path('images/logo-balangan.png');
+@endphp
 
 <div class="kop">
 
-    @if(!empty($adaGambarKop))
+    {{-- ================================================= --}}
+    {{-- KOP BUPATI / WAKIL BUPATI --}}
+    {{-- ================================================= --}}
 
-        {{-- Kop gambar resmi (aset disediakan menyusul, path via config/penandatangan.php) --}}
+    @if($jenisKop === 'bupati')
 
-        <img
-            class="kop-gambar"
-            src="{{ $pathKop }}"
-            alt="Kop Surat"
-        >
+        @if(!empty($adaGambarKop) && is_file($pathKop))
+
+            <img
+                class="kop-gambar"
+                src="{{ $pathKop }}"
+                alt="Kop Surat Bupati Balangan"
+            >
+
+        @else
+
+            <div class="kop-bupati">
+
+                @if(file_exists($garudaPath))
+                    <img
+                        class="kop-bupati-garuda"
+                        src="{{ $garudaPath }}"
+                        alt="Garuda Pancasila"
+                    >
+                @endif
+
+                <div class="kop-bupati-teks">
+                    BUPATI BALANGAN
+                </div>
+
+            </div>
+
+        @endif
+
+    {{-- ================================================= --}}
+    {{-- KOP SEKRETARIS DAERAH --}}
+    {{-- ================================================= --}}
+
+    @elseif($jenisKop === 'sekda')
+
+        @if(!empty($adaGambarKop) && is_file($pathKop))
+
+            <img
+                class="kop-gambar"
+                src="{{ $pathKop }}"
+                alt="Kop Surat Sekretariat Daerah"
+            >
+
+        @else
+
+            <div class="kop-sekda">
+
+                <div class="kop-sekda-pemda">
+                    PEMERINTAH KABUPATEN BALANGAN
+                </div>
+
+                <div class="kop-sekda-dinas">
+                    SEKRETARIAT DAERAH
+                </div>
+
+                <div class="kop-sekda-kab">
+                    KABUPATEN BALANGAN
+                </div>
+
+            </div>
+
+        @endif
+
+    {{-- ================================================= --}}
+    {{-- KOP DISKOMINFO (DEFAULT) --}}
+    {{-- ================================================= --}}
 
     @else
 
-        {{-- Fallback sementara sampai aset kop resmi tersedia --}}
+        @if(!empty($adaGambarKop) && is_file($pathKop))
 
-        <table class="kop-table">
+            <img
+                class="kop-gambar"
+                src="{{ $pathKop }}"
+                alt="Kop Surat Diskominfo"
+            >
 
-            <tr>
+        @else
 
-                <td class="kop-logo">
+            <table class="kop-table">
 
-                    @if(file_exists($logoFallbackPath))
+                <tr>
 
-                        <img
-                            src="{{ $logoFallbackPath }}"
-                            alt="Logo Kabupaten Balangan"
-                        >
+                    <td class="kop-logo">
 
-                    @endif
+                        @if(file_exists($logoFallbackPath))
 
-                </td>
+                            <img
+                                src="{{ $logoFallbackPath }}"
+                                alt="Logo Kabupaten Balangan"
+                            >
+
+                        @endif
+
+                    </td>
 
 
-                <td class="kop-text">
+                    <td class="kop-text">
 
-                    <div class="kop-pemda">
-                        PEMERINTAH KABUPATEN BALANGAN
-                    </div>
+                        <div class="kop-pemda">
+                            PEMERINTAH KABUPATEN BALANGAN
+                        </div>
 
-                    <div class="kop-dinas">
-                        DINAS KOMUNIKASI INFORMATIKA,<br>
-                        STATISTIK DAN PERSANDIAN
-                    </div>
+                        <div class="kop-dinas">
+                            DINAS KOMUNIKASI INFORMATIKA,<br>
+                            STATISTIK DAN PERSANDIAN
+                        </div>
 
-                    <div class="kop-alamat">
-                        Jalan Jenderal Ahmad Yani Km. 3,5 Telp/Fax. (0526) 2028434
-                        Kec. Paringin Selatan<br>
+                        <div class="kop-alamat">
+                            Jalan Jenderal Ahmad Yani Km. 3,5 Telp/Fax. (0526) 2028434
+                            Kec. Paringin Selatan<br>
 
-                        Website : www.diskominfo.balangankab.go.id /
-                        Email : diskominfo@balangankab.go.id
-                    </div>
+                            Website : www.diskominfo.balangankab.go.id /
+                            Email : diskominfo@balangankab.go.id
+                        </div>
 
-                </td>
+                    </td>
 
-            </tr>
+                </tr>
 
-        </table>
+            </table>
+
+        @endif
 
     @endif
 

@@ -6,6 +6,7 @@ use App\Filament\Resources\Spts\Pages\CreateSpt;
 use App\Filament\Resources\Spts\Pages\EditSpt;
 use App\Filament\Resources\Spts\Pages\ListSpts;
 use App\Filament\Resources\Spts\Pages\ViewSpt;
+use App\Filament\Resources\Spts\RelationManagers\SppdsRelationManager;
 use App\Filament\Resources\Spts\Schemas\SptForm;
 use App\Filament\Resources\Spts\Schemas\SptInfolist;
 use App\Filament\Resources\Spts\Tables\SptsTable;
@@ -43,7 +44,9 @@ class SptResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            SppdsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

@@ -175,6 +175,32 @@
 
             </div>
 
+            {{-- DASAR --}}
+
+            <div class="form-group full">
+
+                <label for="dasar">
+                    Dasar
+                </label>
+
+                <textarea
+                    name="dasar"
+                    id="dasar"
+                    rows="4"
+                    placeholder="Contoh:&#10;1. Peraturan Bupati Balangan Nomor ... Tahun ...&#10;2. Keputusan Bupati Balangan Nomor ... Tahun ...&#10;3. Surat Edaran ..."
+                >{{ old('dasar', $spt->dasar ?? '') }}</textarea>
+
+                <small>
+                    Rujukan Perbup/peraturan yang menjadi dasar perjalanan dinas.
+                    Bisa multi-baris.
+                </small>
+
+                @error('dasar')
+                    <span class="field-error">{{ $message }}</span>
+                @enderror
+
+            </div>
+
             {{-- DALAM DAERAH : KECAMATAN + DESA --}}
 
             <div

@@ -26,6 +26,10 @@ return [
         'sekda' => [
             'gambar' => 'images/kop-sekda.png',
         ],
+
+        'diskominfo' => [
+            'gambar' => 'images/kop-diskominfo.png',
+        ],
     ],
 
     /*
@@ -62,6 +66,13 @@ return [
             'nama' => null,
             'nip' => null,
             'kop' => 'sekda',
+        ],
+
+        'kepala-diskominfo' => [
+            'jabatan' => 'Kepala/Ketua Diskominfo',
+            'nama' => null,
+            'nip' => null,
+            'kop' => 'diskominfo',
         ],
     ],
 

@@ -41,6 +41,10 @@ class SptInfolist
                             ->label('Perihal')
                             ->columnSpanFull(),
 
+                        TextEntry::make('dasar')
+                            ->label('Dasar')
+                            ->columnSpanFull(),
+
                         TextEntry::make('kecamatan.nama')
                             ->label('Kecamatan')
                             ->visible(fn ($record) => $record->jenis_perjalanan === 'Dalam Daerah'),

@@ -40,6 +40,7 @@ class FormController extends Controller
                 'tanggal_berangkat' => $validated['tanggal_berangkat'],
                 'tanggal_kembali' => $validated['tanggal_kembali'],
                 'perihal' => $validated['perihal'],
+                'dasar' => $validated['dasar'] ?? null,
                 'kecamatan_id' => $this->kecamatanId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
@@ -107,6 +108,7 @@ class FormController extends Controller
                 'tanggal_berangkat' => $validated['tanggal_berangkat'],
                 'tanggal_kembali' => $validated['tanggal_kembali'],
                 'perihal' => $validated['perihal'],
+                'dasar' => $validated['dasar'] ?? null,
                 'kecamatan_id' => $this->kecamatanId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
@@ -168,6 +170,7 @@ class FormController extends Controller
             'tanggal_berangkat' => ['required', 'date'],
             'tanggal_kembali' => ['required', 'date', 'after_or_equal:tanggal_berangkat'],
             'perihal' => ['required', 'string'],
+            'dasar' => ['nullable', 'string'],
             'pegawai_ids' => ['required', 'array', 'min:1'],
             'pegawai_ids.*' => ['exists:pegawais,id'],
             'kecamatan_id' => [

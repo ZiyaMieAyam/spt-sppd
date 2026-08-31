@@ -1,4 +1,8 @@
-@php($tempatTtd = $tempatTtd ?? 'Paringin Selatan')
+@php
+    $tempatTtd = $tempatTtd ?? 'Paringin';
+    $jenisKop = $penandatangan['kop'] ?? 'diskominfo';
+    $pejabatSementara = Config::get('pejabat-sementara.' . str_replace('-', '_', $penandatangan['jabatan_key'] ?? ''), []);
+@endphp
 
 <div class="ttd-wrapper">
 
@@ -49,7 +53,11 @@
             <div class="ruang-tanda-tangan"></div>
 
             <div class="nama-kepala">
-                {{ $penandatangan['nama'] ?: '( Nama Pejabat Belum Diatur )' }}
+                @if(!empty($penandatangan['nama']))
+                    {{ $penandatangan['nama'] }}
+                @else
+                    ( Nama Pejabat Belum Diatur )
+                @endif
             </div>
 
             @if(!empty($penandatangan['nip']))

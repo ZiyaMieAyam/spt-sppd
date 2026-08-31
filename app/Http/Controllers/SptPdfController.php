@@ -8,6 +8,7 @@ use App\Services\PenandatanganService;
 use App\Support\PegawaiSorter;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class SptPdfController extends Controller
 {
@@ -76,6 +77,10 @@ class SptPdfController extends Controller
             ? PenandatanganService::cari($kunci)
             : null;
 
+        if ($definisi !== null) {
+            $definisi = $this->mergePejabatSementara($definisi, $kunci);
+        }
+
         return [$definisi, is_string($kunci) ? $kunci : ''];
     }
 
@@ -104,5 +109,33 @@ class SptPdfController extends Controller
         $dompdf->set_option('chroot', public_path());
 
         return $pdf->stream($namaFile);
+    }
+
+    private function mergePejabatSementara(array $definisi, string $kunci): array
+    {
+        $mapping = [
+            'bupati' => 'bupati',
+            'wakil-bupati' => 'wakil_bupati',
+            'sekda' => 'sekda',
+            'kepala-diskominfo' => 'kepala_diskominfo',
+        ];
+
+        $sementaraKey = $mapping[$kunci] ?? null;
+
+        if ($sementaraKey === null) {
+            return $definisi;
+        }
+
+        $sementara = Config::get("pejabat-sementara.{$sementaraKey}", []);
+
+        if (empty($definisi['nama']) && !empty($sementara['nama'])) {
+            $definisi['nama'] = $sementara['nama'];
+        }
+
+        if (empty($definisi['nip']) && !empty($sementara['nip'])) {
+            $definisi['nip'] = $sementara['nip'];
+        }
+
+        return $definisi;
     }
 }

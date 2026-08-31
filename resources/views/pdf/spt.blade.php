@@ -74,6 +74,22 @@
             font-weight: bold;
         }
 
+        .dasar-section {
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+
+        .dasar-label {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .dasar-content {
+            margin-left: 0;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
     </style>
 
 </head>
@@ -103,6 +119,23 @@
     </div>
 
 </div>
+
+
+@if(!empty($spt->dasar))
+
+<div class="dasar-section">
+
+    <div class="dasar-label">
+        Dasar
+    </div>
+
+    <div class="dasar-content">
+        {!! nl2br(e($spt->dasar)) !!}
+    </div>
+
+</div>
+
+@endif
 
 
 {{-- ================================================= --}}
