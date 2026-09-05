@@ -56,41 +56,40 @@
         .ttd-depan-sub { font-size: 10pt; }
         .ttd-depan-jab { font-weight: bold; }
 
-        /* ==== BELAKANG ==== */
+        /* ==== BELAKANG — PAGE BREAK ==== */
         .page-break { page-break-before: always; }
 
-        .tbl-blk { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #000; }
-        .tbl-blk td { border: 1px solid #000; vertical-align: middle; padding: 5px 8px; font-size: 10.5pt; line-height: 1.4; }
-        .blk-l { width: 50%; }
-        .blk-r { width: 50%; }
-        .inner-seksi-table { width: 100%; border-collapse: collapse; border: none; }
-        .inner-seksi-table td { border: none; vertical-align: middle; padding: 0; }
-        .seksi-num { width: 12%; text-align: center; font-weight: bold; }
+        /* ==== BACK-PAGE ONLY — scoped, stabil untuk Dompdf ==== */
+        .back-page .tbl-blk { width: 100%; border-collapse: collapse; table-layout: fixed; border: 1px solid #000; }
+        .back-page .tbl-blk > tbody > tr > td { border: 1px solid #000; vertical-align: top; padding: 5px 7px; font-size: 10.5pt; line-height: 1.42; }
+        .back-page .blk-l { width: 50%; }
+        .back-page .blk-r { width: 50%; }
 
-        .et-j { font-weight: bold; font-size: 11pt; margin-bottom: 4px; }
-        .et-dp { font-weight: bold; }
-        .et-f { font-size: 10.5pt; line-height: 1.4; margin-bottom: 3px; }
-
-        .ttd-in { text-align: center; margin-top: 12px; font-size: 10pt; line-height: 1.4; }
-        .ttd-in-sp { height: 48px; }
-        .ttd-in-nm { font-weight: bold; text-decoration: underline; }
-        .ttd-in-sub { font-size: 9.5pt; }
-
-        .cat-j { font-weight: bold; font-size: 10.5pt; margin-bottom: 4px; }
-        .cat-t { font-size: 9.5pt; line-height: 1.5; text-align: justify; }
+        .back-page .dotted-line { text-align: center; letter-spacing: 1px; font-size: 10pt; margin-top: 8px; white-space: nowrap; overflow: hidden; }
+        .back-page .dotted-gap { height: 6mm; }
+        .back-page .sig-jab { font-size: 8.5pt; line-height: 1.35; text-align: center; font-weight: normal; word-wrap: break-word; overflow-wrap: break-word; }
+        .back-page .sig-name { font-weight: bold; text-decoration: underline; font-size: 10.5pt; line-height: 1.35; text-align: center; }
+        .back-page .sig-nip { font-weight: normal; font-size: 9.5pt; line-height: 1.35; text-align: center; }
+        
+        .back-page .c-sep { font-weight: normal; }
+        .back-page .kepala-dinas { text-align: center; font-weight: normal; font-size: 10.5pt; margin-top: 5px; margin-bottom: 5px; }
+        .back-page .cat-j { font-weight: normal; font-size: 10.5pt; }
+        .back-page .cat-t { font-weight: normal; font-size: 9.5pt; line-height: 1.5; text-align: justify; margin-left: 21px;  }
+        .back-page .periksa-text { font-size: 10.5pt; line-height: 1.55; text-align: left; word-wrap: break-word; overflow-wrap: break-word; }
+        .back-page .pada-tanggal { padding-left: 19px; }
+        .back-page .pada-tanggal-3 { padding-left: 24px; }
+        .back-page .c-sep { padding-left: 5mm; }
+        
     </style>
 </head>
 <body>
-
 @include('pdf.partials.kop')
-
 @php
     $kdNama   = $penandatangan['nama']  ?? null;
     $kdJab    = $penandatangan['jabatan'] ?? null;
     $kdNip    = $penandatangan['nip']   ?? null;
     $kdPangkat = $penandatangan['pangkat'] ?? null;
     $kdGol    = $penandatangan['golongan'] ?? null;
-
     $sk       = config('pejabat-sementara.instansi.singkatan', 'DISKOMINFOSAN');
     $pt       = config('pejabat-sementara.pejabat_teknis', []);
     $namaPT   = $pt['nama'] ?? '';
@@ -99,7 +98,6 @@
     $golPT    = $pt['golongan'] ?? '';
     $jabPT    = $pt['jabatan'] ?? 'KEPALA SUB BAGIAN UMUM DAN KEPEGAWAIAN SELAKU PEJABAT PELAKSANA TEKNIS KEGIATAN';
     $isRealPT = !empty($namaPT) && !empty($nipPT) && !str_starts_with($namaPT, '[');
-
     $formatNip = function($nip) {
         $n = preg_replace('/\D/', '', (string)$nip);
         if (strlen($n) === 18) {
@@ -113,32 +111,22 @@
         if (!empty($g)) $out[] = $g;
         return implode(' / ', $out);
     };
-
     $berangkat = 'Kantor ' . $sk . ', Paringin';
+    $kotaAsal = 'Paringin';
     $tujuan = $spt->jenis_perjalanan === 'Dalam Daerah'
         ? trim(($spt->desa ? 'Desa ' . $spt->desa : '')
             . ($spt->kecamatan ? ', Kec. ' . $spt->kecamatan->nama : ''), ' ,')
         : ($spt?->kotaTujuan?->nama ?? '-');
     if ($tujuan === '') { $tujuan = '-'; }
-
     $pangkatPG = $pegawai?->pangkat ?? '';
     $golonganPG = $pegawai?->golongan ?? '';
 @endphp
-
-{{-- ============================================ --}}
-{{-- HALAMAN 1 — DEPAN (TANPA colon di tabel)     --}}
-{{-- ============================================ --}}
-
 <div class="nomor">Nomor : {{ $sppd->nomor_sppd ?? '-' }}</div>
-
 <div class="judul">
     <div class="judul-u">SURAT PERINTAH PERJALANAN DINAS</div>
     <div class="judul-s">(SPPD)</div>
 </div>
-
 <table class="tbl-depan">
-
-    {{-- 1 : nomor 1 center terhadap 1 baris, NOMOR+LABEL menyatu --}}
     <tr>
         <td class="left-cell cell" style="height:13mm;">
             <table class="inner-num-table"><tr><td class="num">1</td><td class="label-text">Pengguna Anggaran/Kuasa Pengguna Anggaran</td></tr></table>
@@ -153,16 +141,12 @@
             @endif
         </td>
     </tr>
-
-    {{-- 2 : nomor 2 center --}}
     <tr>
         <td class="left-cell cell" style="height:10mm;">
             <table class="inner-num-table"><tr><td class="num">2</td><td class="label-text">Nama dan NIP Pegawai yang Diperintahkan</td></tr></table>
         </td>
         <td class="right-cell cell" style="height:10mm;">{{ $pegawai?->nama ?? '-' }} / NIP. {{ $pegawai?->nip ?? '-' }}</td>
     </tr>
-
-    {{-- 3 : nomor 3 CENTER terhadap blok a/b/c — tidak ada garis vertikal/horizontal internal --}}
     <tr>
         <td class="left-cell cell" style="height:24mm;">
             <table class="inner-num-table"><tr><td class="num">3</td><td class="label-text"><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>Pangkat dan Golongan</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Jabatan/Instansi</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>Tingkat Biaya Perjalanan Dinas</div></td></tr></table>
@@ -171,24 +155,18 @@
             <div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ $pangkatPG }}@if($golonganPG) / {{ $golonganPG }}@endif</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $pegawai?->jabatan ?? '-' }} / {{ $pegawai?->unit_kerja ?? config('pejabat-sementara.instansi.nama') }}</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>-</div>
         </td>
     </tr>
-
-    {{-- 4 : nomor 4 center terhadap blok --}}
     <tr>
         <td class="left-cell cell" style="height:11mm;">
             <table class="inner-num-table"><tr><td class="num">4</td><td class="label-text">Maksud Perjalanan Dinas</td></tr></table>
         </td>
         <td class="right-cell cell" style="height:11mm;">{{ $spt?->perihal ?? '-' }}</td>
     </tr>
-
-    {{-- 5 : nomor 5 center --}}
     <tr>
         <td class="left-cell cell" style="height:7mm;">
             <table class="inner-num-table"><tr><td class="num">5</td><td class="label-text">Alat angkut yang dipergunakan</td></tr></table>
         </td>
         <td class="right-cell cell" style="height:7mm;">Kendaraan Dinas / Umum</td>
     </tr>
-
-    {{-- 6 : nomor 6 CENTER di antara a dan b (tengah blok 2 baris) --}}
     <tr>
         <td class="left-cell cell" style="height:16mm;">
             <table class="inner-num-table"><tr><td class="num">6</td><td class="label-text"><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>Tempat berangkat</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Tempat tujuan</div></td></tr></table>
@@ -197,8 +175,6 @@
             <div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ $berangkat }}</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $tujuan }}</div>
         </td>
     </tr>
-
-    {{-- 7 : nomor 7 CENTER sejajar b (tengah blok a/b/c) --}}
     <tr>
         <td class="left-cell cell" style="height:24mm;">
             <table class="inner-num-table"><tr><td class="num">7</td><td class="label-text"><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>Lamanya Perjalanan Dinas</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Tanggal berangkat</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>Tanggal harus kembali/tiba di tempat</div></td></tr></table>
@@ -207,8 +183,6 @@
             <div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>@if($lamaHari){{ $lamaHari }} Hari ({{ $sppd->tanggal_berangkat?->translatedFormat('d F') ?? '-' }} s/d {{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }})@else - @endif</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</div>
         </td>
     </tr>
-
-    {{-- 8 : nomor 8 CENTER terhadap seluruh tinggi blok Pengikut (4 baris) --}}
     <tr>
         <td class="left-cell cell" style="height:28mm;">
             <table class="inner-num-table"><tr><td class="num">8</td><td class="label-text"><div class="sub-line">Pengikut : Nama</div><div class="sub-line"><span class="sub-marker">1.</span><span class="sub-gap"></span></div><div class="sub-line"><span class="sub-marker">2.</span><span class="sub-gap"></span></div><div class="sub-line"><span class="sub-marker">3.</span><span class="sub-gap"></span></div></td></tr></table>
@@ -219,31 +193,14 @@
                     <th style="border:none; border-right:1px solid #000; border-bottom:1px solid #000;">Tanggal Lahir</th>
                     <th style="border:none; border-bottom:1px solid #000;">Keterangan</th>
                 </tr>
-                <tr>
-                    <td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td>
-                    <td style="border:none; height:6mm;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td>
-                    <td style="border:none; height:6mm;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td>
-                    <td style="border:none; height:6mm;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td>
-                    <td style="border:none; height:6mm;">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td>
-                    <td style="border:none; height:2mm;">&nbsp;</td>
-                </tr>
+                <tr><td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td><td style="border:none; height:6mm;">&nbsp;</td></tr>
+                <tr><td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td><td style="border:none; height:6mm;">&nbsp;</td></tr>
+                <tr><td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td><td style="border:none; height:6mm;">&nbsp;</td></tr>
+                <tr><td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td><td style="border:none; height:6mm;">&nbsp;</td></tr>
+                <tr><td style="border:none; border-right:1px solid #000; height:6mm;">&nbsp;</td><td style="border:none; height:2mm;">&nbsp;</td></tr>
             </table>
         </td>
     </tr>
-
-    {{-- 9 : nomor 9 CENTER terhadap seluruh blok Pembebanan Anggaran + a + b --}}
     <tr>
         <td class="left-cell cell" style="height:24mm;">
             <table class="inner-num-table"><tr><td class="num">9</td><td class="label-text"><div class="sub-line">Pembebanan Anggaran</div><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>SKPD</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Kode Rekening</div></td></tr></table>
@@ -252,177 +209,127 @@
             <div class="sub-line">&nbsp;</div><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ config('pejabat-sementara.instansi.nama') }}</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $pegawai?->kode_sppd ?? '-' }}</div>
         </td>
     </tr>
-
-    {{-- 10 : nomor 10 center --}}
     <tr>
         <td class="left-cell cell" style="height:7mm;">
             <table class="inner-num-table"><tr><td class="num">10</td><td class="label-text">Keterangan lain-lain</td></tr></table>
         </td>
         <td class="right-cell cell" style="height:7mm;">-</td>
     </tr>
-
 </table>
-
-{{-- TTD DEPAN — PAKAI colon, urutan Nama → Pangkat/Golongan → NIP --}}
 <div class="ttd-depan">
     <table style="width:100%; border-collapse:collapse;">
-        <tr>
-            <td class="ttd-depan-l">Dikeluarkan di</td>
-            <td style="width:14px; text-align:center;">:</td>
-            <td>Paringin</td>
-        </tr>
-        <tr>
-            <td class="ttd-depan-l">Pada Tanggal</td>
-            <td style="width:14px; text-align:center;">:</td>
-            <td>{{ $spt?->tanggal_spt?->translatedFormat('d F Y') ?? '-' }}</td>
-        </tr>
+        <tr><td class="ttd-depan-l">Dikeluarkan di</td><td style="width:14px; text-align:center;">:</td><td>Paringin</td></tr>
+        <tr><td class="ttd-depan-l">Pada Tanggal</td><td style="width:14px; text-align:center;">:</td><td>{{ $spt?->tanggal_spt?->translatedFormat('d F Y') ?? '-' }}</td></tr>
     </table>
     <div class="ttd-depan-ct">
         <div class="ttd-depan-jab">{{ $kdJab ?? 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN' }}</div>
         <div class="ttd-depan-sp"></div>
         @if(!empty($kdNama))
             <div class="ttd-depan-nm">{{ $kdNama }}</div>
-            @if(!empty($kdPangkat) || !empty($kdGol))
-                <div class="ttd-depan-sub">{{ $pg($kdPangkat, $kdGol) }}</div>
-            @endif
+            @if(!empty($kdPangkat) || !empty($kdGol))<div class="ttd-depan-sub">{{ $pg($kdPangkat, $kdGol) }}</div>@endif
             @if(!empty($kdNip))<div>NIP. {{ $formatNip($kdNip) }}</div>@endif
         @else
             <div class="ttd-depan-nm" style="text-decoration:none;">........................................</div>
         @endif
     </div>
 </div>
-
-
-{{-- ============================================ --}}
-{{-- HALAMAN 2 — BELAKANG (PAKAI colon)          --}}
-{{-- SATU FORMULIR/TABEL BESAR MENYAMBUNG        --}}
-{{-- ============================================ --}}
-
-<div class="page-break">
-
+<div class="page-break"></div>
+<div class="back-page">
 <table class="tbl-blk">
-
-    {{-- SEKSI I : kiri KOSONG, kanan I. CENTER terhadap blok --}}
+    {{-- ROW I : kiri KOSONG, kanan Berangkat dari (tanpa I., tanpa TTD, wide) --}}
     <tr>
-        <td class="blk-l" style="height:66mm;">&nbsp;</td>
-        <td class="blk-r" style="height:66mm;">
-            <table class="inner-seksi-table"><tr><td class="seksi-num">I.</td><td>
-                    <div class="et-f">
-                        <span class="et-dp">Berangkat dari</span> (Tempat Kedudukan) :
-                        <br>{{ $berangkat }}
-                    </div>
-                    <div class="et-f">
-                        <span class="et-dp">Ke</span> :
-                        <br>{{ $tujuan }}
-                    </div>
-                    <div class="et-f">
-                        <span class="et-dp">Pada Tanggal</span> :
-                        <br>{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}
-                    </div>
-                    <div class="ttd-in">
-                        <strong>{{ $jabPT }}</strong>
-                        <div class="ttd-in-sp"></div>
-                        @if($isRealPT)
-                            <div class="ttd-in-nm">{{ $namaPT }}</div>
-                            @if(!empty($pangkatPT) || !empty($golPT))
-                                <div class="ttd-in-sub">{{ $pg($pangkatPT, $golPT) }}</div>
-                            @endif
-                            <div class="ttd-in-sub">NIP. {{ $formatNip($nipPT) }}</div>
-                        @else
-                            <div class="ttd-in-nm">{{ $jabPT }}</div>
-                        @endif
-                    </div>
-            </td></tr></table>
+        <td class="blk-l" style="height:68mm; padding:0;">&nbsp;</td>
+        <td class="blk-r" style="height:68mm;">
+            <table class="f-tbl">
+                <tr>
+                    <td class="c-lab nowrap wide">Berangkat dari</td>
+                    <td class="c-sep">:</td>
+                    <td class="c-val">{{ $kotaAsal }}</td>
+                </tr>
+                <tr>
+                    <td class="c-lab indent wide">Ke</td>
+                    <td class="c-sep">:</td>
+                    <td class="c-val">{{ $tujuan }}</td>
+                </tr>
+                <tr>
+                    <td class="c-lab indent nowrap wide">Pada Tanggal</td>
+                    <td class="c-sep">:</td>
+                    <td class="c-val">{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</td>
+                </tr>
+            </table>
         </td>
     </tr>
-
-    {{-- SEKSI II : II. CENTER terhadap blok kiri, kanan tanpa nomor --}}
     <tr>
-        <td class="blk-l" style="height:34mm;">
-            <table class="inner-seksi-table"><tr><td class="seksi-num">II.</td><td>
-                    <div class="et-f"><span class="et-dp">Tiba di</span> : </div>
-                    <div class="et-f"><span class="et-dp">Pada Tanggal</span> : </div>
-                    <div class="et-f"><span class="et-dp">Kepala</span> : </div>
-            </td></tr></table>
+        <td class="blk-l" style="height:38mm;">
+            <table class="f-tbl">
+                <tr><td class="c-lab nowrap">II. Tiba di</td><td class="c-sep">:</td><td class="c-val">{{ $tujuan }}</td></tr>
+                <tr><td class="c-lab pada-tanggal">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</td></tr>
+            </table>
+            <div style="height:17mm;"></div>
+            <div class="dotted-line">.............................................</div>
         </td>
-        <td class="blk-r" style="height:34mm;">
-            <div class="et-f"><span class="et-dp">Tiba di</span> : </div>
-            <div class="et-f"><span class="et-dp">Pada Tanggal</span> : </div>
-            <div class="et-f"><span class="et-dp">Kepala</span> : </div>
+        <td class="blk-r" style="height:38mm;">
+            <table class="f-tbl">
+                <tr><td class="c-lab nowrap">Tiba di</td><td class="c-sep">:</td><td class="c-val">{{ $kotaAsal }}</td></tr>
+                <tr><td class="c-lab nowrap">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</td></tr>
+            </table>
+            <div style="height:17mm;"></div>
+            <div class="dotted-line">.............................................</div>
         </td>
     </tr>
-
-    {{-- SEKSI III : III. CENTER, semua value kosong --}}
     <tr>
-        <td class="blk-l" style="height:34mm;">
-            <table class="inner-seksi-table"><tr><td class="seksi-num">III.</td><td>
-                    <div class="et-f"><span class="et-dp">Tiba di</span> : </div>
-                    <div class="et-f"><span class="et-dp">Pada Tanggal</span> : </div>
-                    <div class="et-f"><span class="et-dp">Kepala</span> : </div>
-            </td></tr></table>
+        <td class="blk-l" style="height:36mm;">
+            <table class="f-tbl">
+                <tr><td class="c-lab nowrap">III. Tiba di</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
+                <tr><td class="c-lab pada-tanggal-3">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
+            </table>
+            <div style="height:17mm;"></div>
+            <div class="dotted-line">.............................................</div>
         </td>
-        <td class="blk-r" style="height:34mm;">
-            <div class="et-f"><span class="et-dp">Tiba di</span> : </div>
-            <div class="et-f"><span class="et-dp">Pada Tanggal</span> : </div>
-            <div class="et-f"><span class="et-dp">Kepala</span> : </div>
+        <td class="blk-r" style="height:36mm;">
+            <table class="f-tbl">
+                <tr><td class="c-lab nowrap">Tiba di</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
+                <tr><td class="c-lab nowrap">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
+            </table>
+            <div style="height:17mm;"></div>
+            <div class="dotted-line">.............................................</div>
         </td>
     </tr>
-
-    {{-- SEKSI IV : IV. CENTER terhadap blok kiri --}}
     <tr>
-        <td class="blk-l" style="height:70mm;">
-            <table class="inner-seksi-table"><tr><td class="seksi-num">IV.</td><td>
-                    <div class="et-f">
-                        <span class="et-dp">Tiba di</span> :
-                        <br>{{ $berangkat }}
-                    </div>
-                    <div class="et-f">
-                        <span class="et-dp">Pada Tanggal</span> :
-                        <br>{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}
-                    </div>
-                    <div class="et-f"><span class="et-dp">Kepala</span> : </div>
-                    <div class="ttd-in">
-                        <div class="ttd-in-sp"></div>
-                        @if(!empty($kdNama))
-                            <div class="ttd-in-nm">{{ $kdNama }}</div>
-                            @if(!empty($kdPangkat) || !empty($kdGol))
-                                <div class="ttd-in-sub">{{ $pg($kdPangkat, $kdGol) }}</div>
-                            @endif
-                            @if(!empty($kdNip))<div class="ttd-in-sub">NIP. {{ $formatNip($kdNip) }}</div>@endif
-                        @else
-                            <div class="ttd-in-nm" style="text-decoration:none;">........................................</div>
-                        @endif
-                    </div>
-            </td></tr></table>
-        </td>
-        <td class="blk-r" style="height:70mm;">
-            <div class="et-f">
-                Telah diperiksa, dengan keterangan bahwa perjalanan tersebut di atas dilakukan atas perintahnya dan semata-mata untuk kepentingan jabatan dalam waktu yang sesingkat-singkatnya.
+        <td class="blk-l" style="height:64mm;">
+            <table class="f-tbl">
+                <tr><td class="c-lab nowrap">IV. Tiba di</td><td class="c-sep">:</td><td class="c-val">{{ $kotaAsal }}</td></tr>
+                <tr><td class="c-lab pada-tanggal-3">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</td></tr>
+            </table>
+            <div style="height:4mm;"></div>
+            <div class="kepala-dinas">Kepala Dinas</div>
+            <div style="height:30mm;"></div>
+            <div style="text-align:center;">
+                @if(!empty($kdNama))
+                    <div class="sig-name">{{ $kdNama }}</div>
+                    @if(!empty($kdNip))<div class="sig-nip">NIP. {{ $formatNip($kdNip) }}</div>@endif
+                @else
+                    <div class="sig-name">H. Syaifuddin Tailah, S.Pd, MM</div>
+                    <div class="sig-nip">NIP. 19670403 199403 1 015</div>
+                @endif
             </div>
         </td>
+        <td class="blk-r" style="height:64mm; vertical-align:top;">
+            <div class="periksa-text">Telah diperiksa, dengan keterangan bahwa perjalanan tersebut di atas dilakukan atas perintahnya dan semata-mata untuk kepentingan jabatan dalam waktu yang sesingkat-singkatnya.</div>
+        </td>
     </tr>
-
-    {{-- SEKSI V : full width, heading + kotak kosong --}}
     <tr>
-        <td colspan="2" style="height:34mm;">
+        <td colspan="2" style="padding:4px 7px; height:7mm; vertical-align:middle;">
             <div class="cat-j">V. CATATAN LAIN-LAIN</div>
-            <div style="height:20mm;">&nbsp;</div>
         </td>
     </tr>
-
-    {{-- SEKSI VI : full width, heading + paragraf resmi --}}
     <tr>
-        <td colspan="2" style="height:30mm;">
+        <td colspan="2" style="padding:5px 7px;">
             <div class="cat-j">VI. PERHATIAN</div>
-            <div class="cat-t">
-                Pengguna Anggaran/Kuasa Pengguna Anggaran yang menerbitkan SPD, Pejabat/Pegawai/Pihak Lain yang melakukan Perjalanan Dinas, para pejabat yang mengesahkan Tanggal Berangkat/Tiba serta Bendahara Pengeluaran bertanggung jawab berdasarkan Peraturan-Peraturan Keuangan Daerah apabila Negara menderita rugi akibat Kesalahan, Kelalaian dan Kealpaannya.
-            </div>
+            <div class="cat-t">Pengguna Anggaran/Kuasa Pengguna Anggaran yang menerbitkan SPD, Pejabat/Pegawai/Pihak Lain yang melakukan Perjalanan Dinas, para pejabat yang mengesahkan Tanggal Berangkat/Tiba serta Bendahara Pengeluaran bertanggung jawab berdasarkan Peraturan-Peraturan Keuangan Daerah apabila Negara menderita rugi akibat Kesalahan, Kelalaian dan Kealpaannya.</div>
         </td>
     </tr>
-
 </table>
-
 </div>
-
 </body>
 </html>
