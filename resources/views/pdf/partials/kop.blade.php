@@ -56,21 +56,29 @@
 
         @else
 
-            <div class="kop-sekda">
-
-                <div class="kop-sekda-pemda">
-                    PEMERINTAH KABUPATEN BALANGAN
-                </div>
-
-                <div class="kop-sekda-dinas">
-                    SEKRETARIAT DAERAH
-                </div>
-
-                <div class="kop-sekda-kab">
-                    KABUPATEN BALANGAN
-                </div>
-
-            </div>
+            <table class="kop-table">
+                <tr>
+                    <td class="kop-logo">
+                        @if(file_exists($logoFallbackPath))
+                            <img
+                                src="{{ $logoFallbackPath }}"
+                                alt="Logo Kabupaten Balangan"
+                            >
+                        @endif
+                    </td>
+                    <td class="kop-text">
+                        <div class="kop-pemda">
+                            PEMERINTAH KABUPATEN BALANGAN
+                        </div>
+                        <div class="kop-dinas">
+                            SEKRETARIAT DAERAH
+                        </div>
+                        <div class="kop-alamat">
+                            Jl. Jend. Ahmad Yani No. 01 Paringin. Telp. (0526) 28060 Fax. (0526) 28408
+                        </div>
+                    </td>
+                </tr>
+            </table>
 
         @endif
 

@@ -44,6 +44,7 @@ class FormController extends Controller
                 'kecamatan_id' => $this->kecamatanId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
+                'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
             ]);
 
             $urutan = Sppd::nomorBerikutnya($tanggalSpt);
@@ -112,6 +113,7 @@ class FormController extends Controller
                 'kecamatan_id' => $this->kecamatanId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
+                'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
             ]);
 
             $spt->sppds()->delete();
@@ -189,6 +191,7 @@ class FormController extends Controller
                 'exists:kota_tujuans,id',
                 Rule::requiredIf($luarDaerah),
             ],
+            'tempat_kegiatan' => ['nullable', 'string', 'max:255'],
         ], [
             'pegawai_ids.required' => 'Pilih minimal satu pegawai yang ditugaskan.',
             'pegawai_ids.min' => 'Pilih minimal satu pegawai yang ditugaskan.',

@@ -311,23 +311,19 @@
         </td>
 
         <td>
-
-            @if($spt->jenis_perjalanan === 'Dalam Daerah')
-
-                @if($spt->desa)
-                    Desa {{ $spt->desa }}
-                @endif
-
-                @if($spt->kecamatan)
-                    Kec. {{ $spt->kecamatan->nama }}
-                @endif
-
-            @else
-
-                {{ $spt->kotaTujuan?->nama ?? '-' }}
-
-            @endif
-
+            @php
+                $tk = trim((string) ($spt->tempat_kegiatan ?? ''));
+                if ($spt->jenis_perjalanan === 'Dalam Daerah') {
+                    $kec = $spt->kecamatan?->nama ? 'Kec. ' . $spt->kecamatan->nama : '';
+                    $des = $spt->desa ? 'Desa ' . $spt->desa : '';
+                    $p = array_filter([$kec, $des, $tk], fn($v) => $v !== '');
+                    echo $p ? implode(' - ', $p) : '-';
+                } else {
+                    $kota = $spt->kotaTujuan?->nama ?? '';
+                    $p = array_filter([$kota, $tk], fn($v) => $v !== '');
+                    echo $p ? implode(' - ', $p) : '-';
+                }
+            @endphp
         </td>
 
     </tr>

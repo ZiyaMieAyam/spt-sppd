@@ -323,6 +323,39 @@
 
             </div>
 
+            {{-- TEMPAT KEGIATAN (Dalam Daerah & Luar Daerah — field baru, satu kolom tempat_kegiatan) --}}
+
+            <div
+                id="tempat-kegiatan-fields"
+                class="conditional-fields full"
+            >
+
+                <div class="form-group">
+
+                    <label for="tempat_kegiatan">
+                        Tempat Kegiatan
+                    </label>
+
+                    <input
+                        type="text"
+                        name="tempat_kegiatan"
+                        id="tempat_kegiatan"
+                        value="{{ old('tempat_kegiatan', $spt->tempat_kegiatan ?? '') }}"
+                        placeholder="Contoh: Hotel Aria Barito / Aula Kecamatan"
+                    >
+
+                    <small>
+                        Nama tempat/lokasi kegiatan. Contoh untuk Dalam Daerah: Hotel Aria Barito. Untuk Luar Daerah: Hotel Bandung.
+                    </small>
+
+                    @error('tempat_kegiatan')
+                        <span class="field-error">{{ $message }}</span>
+                    @enderror
+
+                </div>
+
+            </div>
+
             {{-- PEGAWAI YANG DITUGASKAN --}}
 
             <div class="form-group full">
@@ -691,17 +724,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const jenis = document.getElementById('jenis_perjalanan');
     const dalamDaerah = document.getElementById('dalam-daerah-fields');
     const luarDaerah = document.getElementById('luar-daerah-fields');
+    const tempatKegiatan = document.getElementById('tempat-kegiatan-fields');
 
     function updateTujuanFields() {
         if (jenis.value === 'Dalam Daerah') {
             dalamDaerah.style.display = 'block';
             luarDaerah.style.display = 'none';
+            tempatKegiatan.style.display = 'block';
         } else if (jenis.value === 'Luar Daerah') {
             dalamDaerah.style.display = 'none';
             luarDaerah.style.display = 'block';
+            tempatKegiatan.style.display = 'block';
         } else {
             dalamDaerah.style.display = 'none';
             luarDaerah.style.display = 'none';
+            tempatKegiatan.style.display = 'none';
         }
     }
 

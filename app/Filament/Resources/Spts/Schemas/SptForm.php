@@ -6,6 +6,7 @@ use App\Models\Pegawai;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class SptForm
@@ -70,6 +71,13 @@ class SptForm
                     ->preload()
                     ->visible(fn ($get) => $get('jenis_perjalanan') === 'Luar Daerah')
                     ->required(fn ($get) => $get('jenis_perjalanan') === 'Luar Daerah'),
+
+                TextInput::make('tempat_kegiatan')
+                    ->label('Tempat Kegiatan')
+                    ->placeholder('Contoh: Hotel Aria Barito / Hotel Bandung / Aula Kecamatan')
+                    ->maxLength(255)
+                    ->visible(fn ($get) => in_array($get('jenis_perjalanan'), ['Dalam Daerah', 'Luar Daerah']))
+                    ->columnSpanFull(),
 
                 Select::make('pegawais')
                     ->label('Pegawai Yang Ditugaskan')

@@ -18,6 +18,7 @@ class Spt extends Model
         'kecamatan_id',
         'desa',
         'kota_tujuan_id',
+        'tempat_kegiatan',
     ];
 
     protected $casts = [

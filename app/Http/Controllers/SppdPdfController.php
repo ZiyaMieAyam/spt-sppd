@@ -21,6 +21,8 @@ class SppdPdfController extends Controller
             'nip' => null,
             'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
         ]);
+        // Kop SPPD harus Sekretariat Daerah sesuai referensi gambar (tanpa ubah back-page)
+        $penandatangan['kop'] = 'sekda';
 
         $lamaHari = null;
 
