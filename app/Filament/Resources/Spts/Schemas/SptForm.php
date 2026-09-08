@@ -3,11 +3,15 @@
 namespace App\Filament\Resources\Spts\Schemas;
 
 use App\Models\Pegawai;
+use App\Services\ScheduleOverlapService;
+use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Model;
 
 class SptForm
 {
@@ -32,11 +36,70 @@ class SptForm
 
                 DatePicker::make('tanggal_berangkat')
                     ->label('Tanggal Berangkat')
-                    ->required(),
+                    ->required()
+                    ->rules([
+                        function (Get $get, ?Model $record): Closure {
+                            return function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                $berangkat = $value;
+                                $kembali = $get('tanggal_kembali');
+
+                                if (!$berangkat || !$kembali) {
+                                    return;
+                                }
+
+                                // Normalisasi ke Y-m-d
+                                $berangkatStr = $berangkat instanceof \DateTimeInterface ? $berangkat->format('Y-m-d') : (string) $berangkat;
+                                $kembaliStr = $kembali instanceof \DateTimeInterface ? $kembali->format('Y-m-d') : (string) $kembali;
+
+                                // Pastikan berangkat <= kembali (validasi lain sudah handle, tapi cegah false positive)
+                                if ($berangkatStr > $kembaliStr) {
+                                    return;
+                                }
+
+                                $excludeId = $record?->id;
+                                $pegawaiIds = $get('pegawais') ?? [];
+
+                                $conflict = ScheduleOverlapService::findConflict($berangkatStr, $kembaliStr, $excludeId, is_array($pegawaiIds) ? $pegawaiIds : []);
+
+                                if ($conflict) {
+                                    $fail($conflict['message']);
+                                }
+                            };
+                        },
+                    ]),
 
                 DatePicker::make('tanggal_kembali')
                     ->label('Tanggal Kembali')
-                    ->required(),
+                    ->required()
+                    ->afterOrEqual('tanggal_berangkat')
+                    ->rules([
+                        function (Get $get, ?Model $record): Closure {
+                            return function (string $attribute, $value, Closure $fail) use ($get, $record) {
+                                $kembali = $value;
+                                $berangkat = $get('tanggal_berangkat');
+
+                                if (!$berangkat || !$kembali) {
+                                    return;
+                                }
+
+                                $berangkatStr = $berangkat instanceof \DateTimeInterface ? $berangkat->format('Y-m-d') : (string) $berangkat;
+                                $kembaliStr = $kembali instanceof \DateTimeInterface ? $kembali->format('Y-m-d') : (string) $kembali;
+
+                                if ($berangkatStr > $kembaliStr) {
+                                    return;
+                                }
+
+                                $excludeId = $record?->id;
+                                $pegawaiIds = $get('pegawais') ?? [];
+
+                                $conflict = ScheduleOverlapService::findConflict($berangkatStr, $kembaliStr, $excludeId, is_array($pegawaiIds) ? $pegawaiIds : []);
+
+                                if ($conflict) {
+                                    $fail($conflict['message']);
+                                }
+                            };
+                        },
+                    ]),
 
                 Textarea::make('perihal')
                     ->label('Perihal')

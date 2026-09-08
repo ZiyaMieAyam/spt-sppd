@@ -7,6 +7,7 @@ use App\Models\KotaTujuan;
 use App\Models\Pegawai;
 use App\Models\Sppd;
 use App\Models\Spt;
+use App\Services\ScheduleOverlapService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,14 @@ class FormController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validatedData($request);
+
+        // Validasi bentrok jadwal: cek global + per-pegawai
+        ScheduleOverlapService::assertNoOverlap(
+            $validated['tanggal_berangkat'],
+            $validated['tanggal_kembali'],
+            null,
+            $validated['pegawai_ids'] ?? null
+        );
 
         DB::transaction(function () use ($validated) {
             $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
@@ -93,6 +102,16 @@ class FormController extends Controller
     public function update(Request $request, Sppd $sppd)
     {
         $validated = $this->validatedData($request);
+
+        // Validasi bentrok jadwal: exclude SPT yang sedang diedit agar tidak dianggap bentrok dengan dirinya sendiri
+        $excludeSptId = $sppd->spt?->id;
+
+        ScheduleOverlapService::assertNoOverlap(
+            $validated['tanggal_berangkat'],
+            $validated['tanggal_kembali'],
+            $excludeSptId,
+            $validated['pegawai_ids'] ?? null
+        );
 
         DB::transaction(function () use ($validated, $sppd) {
             $spt = $sppd->spt;
