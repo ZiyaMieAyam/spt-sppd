@@ -153,6 +153,28 @@
 
             </div>
 
+            {{-- INFO JADWAL PERJALANAN DINAS TERAKHIR (helper kecil di dekat field tanggal) --}}
+            <div class="form-group full">
+                <div class="sppd-last-info">
+                    @php
+                        $lastJadwal = $lastPerjalananDinas ?? $lastSppd ?? null;
+                    @endphp
+                    @if(isset($lastJadwal) && $lastJadwal)
+                        @php
+                            $fmtBerangkat = \Carbon\Carbon::parse($lastJadwal->tanggal_berangkat)->locale('id')->translatedFormat('d F Y');
+                            $fmtKembali = \Carbon\Carbon::parse($lastJadwal->tanggal_kembali)->locale('id')->translatedFormat('d F Y');
+                            $fmtNext = isset($nextAvailable) && $nextAvailable ? \Carbon\Carbon::parse($nextAvailable)->locale('id')->translatedFormat('d F Y') : null;
+                        @endphp
+                        <span>Jadwal perjalanan dinas terakhir: {{ $fmtBerangkat }} s/d {{ $fmtKembali }}</span>
+                        @if($fmtNext)
+                            <span>Tanggal tersedia berikutnya: {{ $fmtNext }}</span>
+                        @endif
+                    @else
+                        <span>Belum ada jadwal perjalanan dinas.</span>
+                    @endif
+                </div>
+            </div>
+
             {{-- PERIHAL --}}
 
             <div class="form-group full">
@@ -187,7 +209,7 @@
                     name="dasar"
                     id="dasar"
                     rows="4"
-                    placeholder="Contoh:&#10;1. Peraturan Bupati Balangan Nomor ... Tahun ...&#10;2. Keputusan Bupati Balangan Nomor ... Tahun ...&#10;3. Surat Edaran ..."
+                    placeholder="Masukkan nomor, tanggal, dan perihal surat/telaahan yang menjadi dasar perjalanan dinas"
                 >{{ old('dasar', $spt->dasar ?? '') }}</textarea>
 
                 <small>
@@ -510,6 +532,25 @@
     margin-top: 6px;
     color: #dc2626;
     font-size: 12px;
+}
+
+.sppd-last-info {
+    background: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 11.5px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-top: -6px;
+}
+
+.sppd-last-info span {
+    display: block;
+}
+
+.sppd-last-info span + span {
+    margin-top: 2px;
 }
 
 .conditional-fields {

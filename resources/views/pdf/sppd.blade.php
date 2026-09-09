@@ -30,13 +30,12 @@
             .inner-num-table { width: 100%; border-collapse: collapse; border: none; }
             .inner-num-table td { border: none; vertical-align: middle; padding: 0; }
             .num { width: 14%; text-align: center; font-size: 11pt; }
-            .label-text { padding-left: 2px; line-height: 1.55; }
+            .label-text { padding-left: 2px; line-height: 0.55; }
             .right-cell { line-height: 1.55; }
             .sub-line { line-height: 1.55; }
-            .sub-line + .sub-line { margin-top: 1px; }
-            .sub-marker { display: inline-block; width: 14px; }
-            .sub-gap { display: inline-block; width: 9px; }
-            .sub-lbl { padding-left: 22px; }
+            .sub-line + .sub-line { margin-top: 5px; }
+            .sub-marker {}
+            .sub-gap { display: inline-block; width: 10px; }
 
             /* Sub-tabel Pengikut: kolom Isi (label) + Keterangan */
             .tbl-pkg { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9.5pt; }
@@ -194,7 +193,7 @@
                 <table class="inner-num-table"><tr><td class="num">7</td><td class="label-text"><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>Lamanya Perjalanan Dinas</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Tanggal berangkat</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>Tanggal harus kembali/tiba di tempat</div></td></tr></table>
             </td>
             <td class="right-cell cell" style="height:24mm;">
-                <div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>@if($lamaHari){{ $lamaHari }} Hari ({{ $sppd->tanggal_berangkat?->translatedFormat('d F') ?? '-' }} s/d {{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }})@else - @endif</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</div>
+                <div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ $lamaHari }} Hari </div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</div>
             </td>
         </tr>
         <tr>
@@ -220,7 +219,7 @@
                 <table class="inner-num-table"><tr><td class="num">9</td><td class="label-text"><div class="sub-line">Pembebanan Anggaran</div><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>SKPD</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Kode Rekening</div></td></tr></table>
             </td>
             <td class="right-cell cell" style="height:24mm;">
-                <div class="sub-line">&nbsp;</div><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ config('pejabat-sementara.instansi.nama') }}</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>{{ $pegawai?->kode_sppd ?? '-' }}</div>
+                <div class="sub-line">&nbsp;</div><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>{{ config('pejabat-sementara.instansi.nama') }}</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>-</div>
             </td>
         </tr>
         <tr>

@@ -18,12 +18,18 @@ class FormController extends Controller
 {
     public function create()
     {
+        $lastPerjalananDinas = ScheduleOverlapService::getLastPerjalananDinas();
+        $nextAvailable = ScheduleOverlapService::getNextAvailableDate($lastPerjalananDinas);
+
         return view('form', [
             'pegawais' => Pegawai::orderBy('nama')->get(),
             'kecamatans' => Kecamatan::orderBy('nama')->get(),
             'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
             'selectedPegawaiIds' => [],
             'editMode' => false,
+            'lastPerjalananDinas' => $lastPerjalananDinas,
+            'lastSppd' => $lastPerjalananDinas, // alias kompatibilitas
+            'nextAvailable' => $nextAvailable,
         ]);
     }
 
@@ -85,6 +91,9 @@ class FormController extends Controller
     public function edit(Sppd $sppd)
     {
         $spt = $sppd->spt;
+        $excludeSptId = $spt?->id;
+        $lastPerjalananDinas = ScheduleOverlapService::getLastPerjalananDinas($excludeSptId);
+        $nextAvailable = ScheduleOverlapService::getNextAvailableDate($lastPerjalananDinas);
 
         return view('form', [
             'sppd' => $sppd,
@@ -96,6 +105,9 @@ class FormController extends Controller
                 ? $spt->sppds()->pluck('pegawai_id')->toArray()
                 : [],
             'editMode' => true,
+            'lastPerjalananDinas' => $lastPerjalananDinas,
+            'lastSppd' => $lastPerjalananDinas, // alias kompatibilitas
+            'nextAvailable' => $nextAvailable,
         ]);
     }
 

@@ -160,6 +160,54 @@ class ScheduleOverlapService
     }
 
     /**
+     * Ambil jadwal perjalanan dinas terakhir berdasarkan tanggal_kembali paling akhir.
+     * Sumber data: tabel spts (jadwal perjalanan dinas), bukan sekadar sppd per-pegawai.
+     * SPPD mengikuti tanggal yang sama dari SPT, sehingga query SPT lebih representatif.
+     */
+    public static function getLastPerjalananDinas(?int $excludeSptId = null): ?Spt
+    {
+        return Spt::query()
+            ->when($excludeSptId !== null, fn (Builder $q) => $q->where('id', '!=', $excludeSptId))
+            ->orderByDesc('tanggal_kembali')
+            ->orderByDesc('tanggal_berangkat')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * Ambil SPPD terakhir berdasarkan tanggal_kembali paling akhir.
+     * Dipertahankan untuk kompatibilitas; untuk jadwal perjalanan dinas gunakan getLastPerjalananDinas().
+     */
+    public static function getLastSppd(?int $excludeSptId = null): ?Sppd
+    {
+        return Sppd::query()
+            ->when($excludeSptId !== null, fn (Builder $q) => $q->where('spt_id', '!=', $excludeSptId))
+            ->orderByDesc('tanggal_kembali')
+            ->orderByDesc('tanggal_berangkat')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * Tanggal tersedia berikutnya = tanggal_kembali jadwal terakhir + 1 hari.
+     * Menerima Spt atau Sppd agar kompatibel dengan kedua sumber data.
+     *
+     * @param Spt|Sppd|null $last
+     */
+    public static function getNextAvailableDate(Spt|Sppd|null $last): ?Carbon
+    {
+        if (!$last || !$last->tanggal_kembali) {
+            return null;
+        }
+
+        $kembali = $last->tanggal_kembali instanceof Carbon
+            ? $last->tanggal_kembali
+            : Carbon::parse($last->tanggal_kembali);
+
+        return $kembali->copy()->addDay();
+    }
+
+    /**
      * Helper untuk throw ValidationException dengan pesan bentrok di field tanggal_berangkat & tanggal_kembali.
      */
     public static function assertNoOverlap(
