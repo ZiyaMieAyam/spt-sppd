@@ -18,10 +18,10 @@ class PegawaiSeeder extends Seeder
     public function run(): void
     {
         $pegawais = [
-            // 1. Kepala Dinas — 097.2 (reuse NIP lama agar tidak duplikat)
+            // 1. Kepala Dinas — 097.2 — Kepala Dinas Kominfosan (data resmi)
             [
-                'nip' => '197001011990031001',
-                'nama' => 'Hendra Wijaya Kusuma, S.STP., M.Si.',
+                'nip' => '196704031994031015',
+                'nama' => 'H. Syaifuddin Tailah, S.Pd, MM',
                 'pangkat' => 'Pembina Utama Muda',
                 'golongan' => 'IV/c',
                 'jabatan' => 'Kepala Dinas',

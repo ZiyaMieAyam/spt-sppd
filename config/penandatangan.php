@@ -69,9 +69,9 @@ return [
         ],
 
         'kepala-diskominfo' => [
-            'jabatan' => 'Kepala/Ketua Diskominfo',
-            'nama' => null,
-            'nip' => null,
+            'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
+            'nama' => 'H. Syaifuddin Tailah, S.Pd, MM',
+            'nip' => '196704031994031015',
             'kop' => 'diskominfo',
         ],
     ],

@@ -35,8 +35,10 @@ return [
     ],
 
     'kepala_diskominfo' => [
-        'nama'  => null,
-        'nip'   => null,
+        'nama'  => 'H. Syaifuddin Tailah, S.Pd, MM',
+        'nip'   => '196704031994031015',
+        'pangkat' => 'Pembina Utama Muda',
+        'golongan' => 'IV/c',
         'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
     ],
 
@@ -51,8 +53,8 @@ return [
     */
 
     'kepala_dinas' => [
-        'nama'  => 'Drs. H. MUSA, M.AP',
-        'nip'   => '196801131997031007',
+        'nama'  => 'H. Syaifuddin Tailah, S.Pd, MM',
+        'nip'   => '196704031994031015',
         'pangkat' => 'Pembina Utama Muda',
         'golongan' => 'IV/c',
         'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',

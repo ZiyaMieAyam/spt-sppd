@@ -235,11 +235,11 @@
             <tr><td class="ttd-depan-l">Pada Tanggal</td><td style="width:14px; text-align:center;">:</td><td>{{ $spt?->tanggal_spt?->translatedFormat('d F Y') ?? '-' }}</td></tr>
         </table>
         <div class="ttd-depan-ct">
-            <div class="ttd-depan-jab">SEKRETARIS DAERAH<br>KABUPATEN BALANGAN,</div>
+            <div class="ttd-depan-jab">KEPALA DINAS KOMUNIKASI, INFORMATIKA,<br>STATISTIK DAN PERSANDIAN<br>KABUPATEN BALANGAN</div>
             <div class="ttd-depan-sp"></div>
-            <div class="ttd-depan-nm">FAKHRIYANTO, S.Pt, MP</div>
-            <div class="ttd-depan-sub">Pembina Tk. I (IV/b)</div>
-            <div>NIP. 197806012005011016</div>
+            <div class="ttd-depan-nm">H. Syaifuddin Tailah, S.Pd, MM</div>
+            <div class="ttd-depan-sub">Pembina Utama Muda (IV/c)</div>
+            <div>NIP. 19670403 199403 1 015</div>
         </div>
     </div>
     <div class="page-break"></div>
