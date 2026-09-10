@@ -7,56 +7,150 @@ use Illuminate\Database\Seeder;
 
 class KotaTujuanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // 99 Kota PERSIS dari prompt — jangan ubah, jangan cari sumber lain
         $kotas = [
-            ['nama' => 'Banjarmasin'],
-            ['nama' => 'Banjarbaru'],
-            ['nama' => 'Balangan'],
-            ['nama' => 'Tabalong'],
-            ['nama' => 'Hulu Sungai Utara'],
-            ['nama' => 'Hulu Sungai Tengah'],
-            ['nama' => 'Hulu Sungai Selatan'],
-            ['nama' => 'Tanah Laut'],
-            ['nama' => 'Tanah Bumbu'],
-            ['nama' => 'Kotabaru'],
-            ['nama' => 'Barito Kuala'],
-            ['nama' => 'Tapin'],
-            ['nama' => 'Banjar'],
-            ['nama' => 'Palangka Raya'],
-            ['nama' => 'Samarinda'],
-            ['nama' => 'Balikpapan'],
-            ['nama' => 'Pontianak'],
-            ['nama' => 'Jakarta'],
-            ['nama' => 'Bandung'],
-            ['nama' => 'Yogyakarta'],
-            ['nama' => 'Semarang'],
-            ['nama' => 'Surabaya'],
-            ['nama' => 'Malang'],
-            ['nama' => 'Denpasar'],
-            ['nama' => 'Mataram'],
-            ['nama' => 'Makassar'],
-            ['nama' => 'Manado'],
-            ['nama' => 'Palu'],
-            ['nama' => 'Kendari'],
-            ['nama' => 'Medan'],
-            ['nama' => 'Padang'],
-            ['nama' => 'Pekanbaru'],
-            ['nama' => 'Batam'],
-            ['nama' => 'Palembang'],
-            ['nama' => 'Lampung'],
-            ['nama' => 'Jambi'],
-            ['nama' => 'Bengkulu'],
-            ['nama' => 'Aceh'],
-            ['nama' => 'Sorong'],
-            ['nama' => 'Jayapura'],
+            // ACEH 5
+            'Banda Aceh',
+            'Langsa',
+            'Lhokseumawe',
+            'Sabang',
+            'Subulussalam',
+            // BALI 1
+            'Denpasar',
+            // BANGKA BELITUNG 1
+            'Pangkalpinang',
+            // BANTEN 4
+            'Cilegon',
+            'Serang',
+            'Tangerang Selatan',
+            'Tangerang',
+            // BENGKULU 1
+            'Bengkulu',
+            // DIY 1
+            'Yogyakarta',
+            // DKI JAKARTA 5
+            'Kota Administrasi Jakarta Barat',
+            'Kota Administrasi Jakarta Pusat',
+            'Kota Administrasi Jakarta Selatan',
+            'Kota Administrasi Jakarta Timur',
+            'Kota Administrasi Jakarta Utara',
+            // GORONTALO 1
+            'Gorontalo',
+            // JAMBI 2
+            'Jambi',
+            'Sungai Penuh',
+            // JAWA BARAT 9
+            'Bandung',
+            'Bekasi',
+            'Bogor',
+            'Cimahi',
+            'Cirebon',
+            'Depok',
+            'Sukabumi',
+            'Tasikmalaya',
+            'Banjar',
+            // JAWA TENGAH 6
+            'Magelang',
+            'Pekalongan',
+            'Salatiga',
+            'Semarang',
+            'Surakarta',
+            'Tegal',
+            // JAWA TIMUR 9
+            'Batu',
+            'Blitar',
+            'Kediri',
+            'Madiun',
+            'Malang',
+            'Mojokerto',
+            'Pasuruan',
+            'Probolinggo',
+            'Surabaya',
+            // KALIMANTAN BARAT 2
+            'Pontianak',
+            'Singkawang',
+            // KALIMANTAN SELATAN 2
+            'Banjarbaru',
+            'Banjarmasin',
+            // KALIMANTAN TENGAH 1
+            'Palangka Raya',
+            // KALIMANTAN TIMUR 3
+            'Balikpapan',
+            'Bontang',
+            'Samarinda',
+            // NUSANTARA 1
+            'Nusantara',
+            // KALIMANTAN UTARA 1
+            'Tarakan',
+            // KEPULAUAN RIAU 2
+            'Batam',
+            'Tanjungpinang',
+            // LAMPUNG 2
+            'Bandar Lampung',
+            'Metro',
+            // MALUKU UTARA 2
+            'Ternate',
+            'Tidore Kepulauan',
+            // MALUKU 2
+            'Ambon',
+            'Tual',
+            // NTB 2
+            'Bima',
+            'Mataram',
+            // NTT 1
+            'Kupang',
+            // PAPUA BARAT DAYA 1
+            'Sorong',
+            // PAPUA 1
+            'Jayapura',
+            // RIAU 2
+            'Dumai',
+            'Pekanbaru',
+            // SULSEL 3
+            'Makassar',
+            'Palopo',
+            'Parepare',
+            // SULTENG 1
+            'Palu',
+            // SULTRA 2
+            'Baubau',
+            'Kendari',
+            // SULUT 4
+            'Bitung',
+            'Kotamobagu',
+            'Manado',
+            'Tomohon',
+            // SUMBAR 7
+            'Bukittinggi',
+            'Padang',
+            'Padang Panjang',
+            'Pariaman',
+            'Payakumbuh',
+            'Sawahlunto',
+            'Solok',
+            // SUMSEL 4
+            'Lubuk Linggau',
+            'Pagar Alam',
+            'Palembang',
+            'Prabumulih',
+            // SUMUT 8
+            'Binjai',
+            'Gunungsitoli',
+            'Medan',
+            'Padangsidimpuan',
+            'Pematangsiantar',
+            'Sibolga',
+            'Tanjungbalai',
+            'Tebing Tinggi',
         ];
 
-        foreach ($kotas as $kota) {
-            KotaTujuan::firstOrCreate($kota);
+        foreach ($kotas as $nama) {
+            KotaTujuan::updateOrCreate(
+                ['nama' => $nama],
+                []
+            );
         }
     }
 }

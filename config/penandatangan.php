@@ -48,23 +48,29 @@ return [
 
     'penandatangan' => [
         'bupati' => [
-            'jabatan' => 'Bupati Balangan',
-            'nama' => null,
+            'jabatan' => 'BUPATI BALANGAN',
+            'nama' => 'H. Abdul Hadi, S.Ag., M.I.Kom.',
             'nip' => null,
+            'pangkat' => null,
+            'golongan' => null,
             'kop' => 'bupati',
         ],
 
         'wakil-bupati' => [
-            'jabatan' => 'Wakil Bupati Balangan',
-            'nama' => null,
+            'jabatan' => 'WAKIL BUPATI BALANGAN',
+            'nama' => 'H. Akhmad Fauzi, S.Pd.',
             'nip' => null,
+            'pangkat' => null,
+            'golongan' => null,
             'kop' => 'bupati',
         ],
 
         'sekda' => [
-            'jabatan' => 'Sekretaris Daerah Kabupaten Balangan',
-            'nama' => null,
-            'nip' => null,
+            'jabatan' => 'SEKRETARIS DAERAH KABUPATEN BALANGAN',
+            'nama' => 'FAKHRIYANTO, S.Pt, MP',
+            'nip' => '197806012005011016',
+            'pangkat' => 'Pembina Tk. I',
+            'golongan' => 'IV/b',
             'kop' => 'sekda',
         ],
 
@@ -72,6 +78,8 @@ return [
             'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
             'nama' => 'H. Syaifuddin Tailah, S.Pd, MM',
             'nip' => '196704031994031015',
+            'pangkat' => 'Pembina Utama Muda',
+            'golongan' => 'IV/c',
             'kop' => 'diskominfo',
         ],
     ],

@@ -26,8 +26,9 @@ class PegawaiForm
 
                 TextInput::make('pangkat')
                     ->label('Pangkat')
-                    ->required()
-                    ->maxLength(255),
+                    ->nullable()
+                    ->maxLength(255)
+                    ->placeholder('Kosongkan untuk PPPK (tidak ada pangkat)'),
 
                 TextInput::make('golongan')
                     ->label('Golongan')
@@ -59,6 +60,7 @@ class PegawaiForm
                     ->label('Status')
                     ->options([
                         'ASN' => 'ASN',
+                        'PPPK' => 'PPPK',
                         'Non ASN' => 'Non ASN',
                     ])
                     ->default('ASN')

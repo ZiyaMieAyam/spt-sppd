@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Spts\Schemas;
 
+use App\Models\Desa;
 use App\Models\Pegawai;
 use App\Services\ScheduleOverlapService;
 use Closure;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
@@ -38,70 +40,12 @@ class SptForm
 
                 DatePicker::make('tanggal_berangkat')
                     ->label('Tanggal Berangkat')
-                    ->required()
-                    ->rules([
-                        function (Get $get, ?Model $record): Closure {
-                            return function (string $attribute, $value, Closure $fail) use ($get, $record) {
-                                $berangkat = $value;
-                                $kembali = $get('tanggal_kembali');
-
-                                if (!$berangkat || !$kembali) {
-                                    return;
-                                }
-
-                                // Normalisasi ke Y-m-d
-                                $berangkatStr = $berangkat instanceof \DateTimeInterface ? $berangkat->format('Y-m-d') : (string) $berangkat;
-                                $kembaliStr = $kembali instanceof \DateTimeInterface ? $kembali->format('Y-m-d') : (string) $kembali;
-
-                                // Pastikan berangkat <= kembali (validasi lain sudah handle, tapi cegah false positive)
-                                if ($berangkatStr > $kembaliStr) {
-                                    return;
-                                }
-
-                                $excludeId = $record?->id;
-                                $pegawaiIds = $get('pegawais') ?? [];
-
-                                $conflict = ScheduleOverlapService::findConflict($berangkatStr, $kembaliStr, $excludeId, is_array($pegawaiIds) ? $pegawaiIds : []);
-
-                                if ($conflict) {
-                                    $fail($conflict['message']);
-                                }
-                            };
-                        },
-                    ]),
+                    ->required(),
 
                 DatePicker::make('tanggal_kembali')
                     ->label('Tanggal Kembali')
                     ->required()
-                    ->afterOrEqual('tanggal_berangkat')
-                    ->rules([
-                        function (Get $get, ?Model $record): Closure {
-                            return function (string $attribute, $value, Closure $fail) use ($get, $record) {
-                                $kembali = $value;
-                                $berangkat = $get('tanggal_berangkat');
-
-                                if (!$berangkat || !$kembali) {
-                                    return;
-                                }
-
-                                $berangkatStr = $berangkat instanceof \DateTimeInterface ? $berangkat->format('Y-m-d') : (string) $berangkat;
-                                $kembaliStr = $kembali instanceof \DateTimeInterface ? $kembali->format('Y-m-d') : (string) $kembali;
-
-                                if ($berangkatStr > $kembaliStr) {
-                                    return;
-                                }
-
-                                $excludeId = $record?->id;
-                                $pegawaiIds = $get('pegawais') ?? [];
-
-                                $conflict = ScheduleOverlapService::findConflict($berangkatStr, $kembaliStr, $excludeId, is_array($pegawaiIds) ? $pegawaiIds : []);
-
-                                if ($conflict) {
-                                    $fail($conflict['message']);
-                                }
-                            };
-                        },
-                    ]),
+                    ->afterOrEqual('tanggal_berangkat'),
 
                 Placeholder::make('sppd_last_info')
                     ->label('')
@@ -112,13 +56,8 @@ class SptForm
                         }
                         $fmtBerangkat = ScheduleOverlapService::formatTanggalIndo($last->tanggal_berangkat);
                         $fmtKembali = ScheduleOverlapService::formatTanggalIndo($last->tanggal_kembali);
-                        $next = ScheduleOverlapService::getNextAvailableDate($last);
-                        $fmtNext = $next ? ScheduleOverlapService::formatTanggalIndo($next) : null;
                         $html = '<div style="font-size:11.5px;color:#6b7280;line-height:1.6;background:#f9fafb;border:1px solid #f3f4f6;border-radius:6px;padding:9px 12px;">';
                         $html .= '<span>Jadwal perjalanan dinas terakhir: ' . e($fmtBerangkat) . ' s/d ' . e($fmtKembali) . '</span>';
-                        if ($fmtNext) {
-                            $html .= '<br><span>Tanggal tersedia berikutnya: ' . e($fmtNext) . '</span>';
-                        }
                         $html .= '</div>';
 
                         return new HtmlString($html);
@@ -142,14 +81,48 @@ class SptForm
                     ->relationship('kecamatan', 'nama')
                     ->searchable()
                     ->preload()
+                    ->live()
+                    ->afterStateUpdated(fn (Set $set) => $set('desa', null))
                     ->visible(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
                     ->required(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah'),
 
-                Textarea::make('desa')
-                    ->label('Desa')
-                    ->rows(2)
+                Select::make('desa')
+                    ->label('Desa/Kelurahan')
+                    ->options(function (Get $get): array {
+                        $kecamatanId = $get('kecamatan_id');
+                        if (! $kecamatanId) {
+                            return [];
+                        }
+                        return Desa::where('kecamatan_id', $kecamatanId)
+                            ->orderBy('nama')
+                            ->pluck('nama', 'nama')
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->live()
                     ->visible(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
-                    ->required(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah'),
+                    ->required(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
+                    ->placeholder('Pilih desa/kelurahan')
+                    ->rules([
+                        function (Get $get): Closure {
+                            return function (string $attribute, $value, Closure $fail) use ($get) {
+                                if (! $value) {
+                                    return;
+                                }
+                                $kecamatanId = $get('kecamatan_id');
+                                if (! $kecamatanId) {
+                                    return;
+                                }
+                                $exists = Desa::where('nama', $value)
+                                    ->where('kecamatan_id', $kecamatanId)
+                                    ->exists();
+                                if (! $exists) {
+                                    $fail('Desa/Kelurahan tidak valid untuk kecamatan terpilih.');
+                                }
+                            };
+                        },
+                    ]),
 
                 Select::make('kota_tujuan_id')
                     ->label('Kota Tujuan')

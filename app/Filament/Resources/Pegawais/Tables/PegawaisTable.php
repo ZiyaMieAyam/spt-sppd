@@ -46,6 +46,7 @@ class PegawaisTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'ASN' => 'success',
+                        'PPPK' => 'info',
                         'Non ASN' => 'warning',
                         default => 'gray',
                     }),
@@ -59,6 +60,7 @@ class PegawaisTable
                 SelectFilter::make('status')
                     ->options([
                         'ASN' => 'ASN',
+                        'PPPK' => 'PPPK',
                         'Non ASN' => 'Non ASN',
                     ]),
 

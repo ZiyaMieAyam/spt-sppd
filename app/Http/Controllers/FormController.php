@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Desa;
 use App\Models\Kecamatan;
 use App\Models\KotaTujuan;
 use App\Models\Pegawai;
@@ -19,31 +20,21 @@ class FormController extends Controller
     public function create()
     {
         $lastPerjalananDinas = ScheduleOverlapService::getLastPerjalananDinas();
-        $nextAvailable = ScheduleOverlapService::getNextAvailableDate($lastPerjalananDinas);
 
         return view('form', [
             'pegawais' => Pegawai::orderBy('nama')->get(),
-            'kecamatans' => Kecamatan::orderBy('nama')->get(),
+            'kecamatans' => Kecamatan::with('desas')->orderBy('nama')->get(),
             'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
             'selectedPegawaiIds' => [],
             'editMode' => false,
             'lastPerjalananDinas' => $lastPerjalananDinas,
             'lastSppd' => $lastPerjalananDinas, // alias kompatibilitas
-            'nextAvailable' => $nextAvailable,
         ]);
     }
 
     public function store(Request $request)
     {
         $validated = $this->validatedData($request);
-
-        // Validasi bentrok jadwal: cek global + per-pegawai
-        ScheduleOverlapService::assertNoOverlap(
-            $validated['tanggal_berangkat'],
-            $validated['tanggal_kembali'],
-            null,
-            $validated['pegawai_ids'] ?? null
-        );
 
         DB::transaction(function () use ($validated) {
             $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
@@ -93,13 +84,12 @@ class FormController extends Controller
         $spt = $sppd->spt;
         $excludeSptId = $spt?->id;
         $lastPerjalananDinas = ScheduleOverlapService::getLastPerjalananDinas($excludeSptId);
-        $nextAvailable = ScheduleOverlapService::getNextAvailableDate($lastPerjalananDinas);
 
         return view('form', [
             'sppd' => $sppd,
             'spt' => $spt,
             'pegawais' => Pegawai::orderBy('nama')->get(),
-            'kecamatans' => Kecamatan::orderBy('nama')->get(),
+            'kecamatans' => Kecamatan::with('desas')->orderBy('nama')->get(),
             'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
             'selectedPegawaiIds' => $spt
                 ? $spt->sppds()->pluck('pegawai_id')->toArray()
@@ -107,23 +97,12 @@ class FormController extends Controller
             'editMode' => true,
             'lastPerjalananDinas' => $lastPerjalananDinas,
             'lastSppd' => $lastPerjalananDinas, // alias kompatibilitas
-            'nextAvailable' => $nextAvailable,
         ]);
     }
 
     public function update(Request $request, Sppd $sppd)
     {
         $validated = $this->validatedData($request);
-
-        // Validasi bentrok jadwal: exclude SPT yang sedang diedit agar tidak dianggap bentrok dengan dirinya sendiri
-        $excludeSptId = $sppd->spt?->id;
-
-        ScheduleOverlapService::assertNoOverlap(
-            $validated['tanggal_berangkat'],
-            $validated['tanggal_kembali'],
-            $excludeSptId,
-            $validated['pegawai_ids'] ?? null
-        );
 
         DB::transaction(function () use ($validated, $sppd) {
             $spt = $sppd->spt;
@@ -216,6 +195,20 @@ class FormController extends Controller
                 'string',
                 'max:255',
                 Rule::requiredIf($dalamDaerah),
+                function (string $attribute, mixed $value, \Closure $fail) use ($request) {
+                    if ($request->input('jenis_perjalanan') === 'Dalam Daerah' && $value) {
+                        $kecamatanId = $request->input('kecamatan_id');
+                        if (! $kecamatanId) {
+                            return;
+                        }
+                        $exists = Desa::where('nama', $value)
+                            ->where('kecamatan_id', $kecamatanId)
+                            ->exists();
+                        if (! $exists) {
+                            $fail('Desa/Kelurahan tidak valid untuk kecamatan terpilih.');
+                        }
+                    }
+                },
             ],
             'kota_tujuan_id' => [
                 'nullable',

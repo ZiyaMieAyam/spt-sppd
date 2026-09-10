@@ -128,12 +128,10 @@ class SptPdfController extends Controller
 
         $sementara = Config::get("pejabat-sementara.{$sementaraKey}", []);
 
-        if (empty($definisi['nama']) && !empty($sementara['nama'])) {
-            $definisi['nama'] = $sementara['nama'];
-        }
-
-        if (empty($definisi['nip']) && !empty($sementara['nip'])) {
-            $definisi['nip'] = $sementara['nip'];
+        foreach (['nama', 'nip', 'pangkat', 'golongan', 'jabatan'] as $field) {
+            if (empty($definisi[$field]) && !empty($sementara[$field])) {
+                $definisi[$field] = $sementara[$field];
+            }
         }
 
         return $definisi;

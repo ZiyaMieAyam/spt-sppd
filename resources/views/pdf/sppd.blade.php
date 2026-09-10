@@ -31,11 +31,11 @@
             .inner-num-table td { border: none; vertical-align: middle; padding: 0; }
             .num { width: 14%; text-align: center; font-size: 11pt; }
             .label-text { padding-left: 2px; line-height: 0.55; }
-            .right-cell { line-height: 1.55; }
-            .sub-line { line-height: 1.55; }
+            .right-cell { line-height: 1.40; }
+            .sub-line { line-height: 1.40; }
             .sub-line + .sub-line { margin-top: 5px; }
-            .sub-marker {}
-            .sub-gap { display: inline-block; width: 10px; }
+            .sub-marker { line-height: 1.40; font-weight: normal; }
+            .sub-gap { display: inline-block; width: 10px;  }
 
             /* Sub-tabel Pengikut: kolom Isi (label) + Keterangan */
             .tbl-pkg { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9.5pt; }
@@ -64,7 +64,7 @@
             .back-page .blk-l { width: 50%; }
             .back-page .blk-r { width: 50%; }
 
-            .back-page .dotted-line { text-align: center; letter-spacing: 1px; font-size: 10pt; margin-top: 8px; white-space: nowrap; overflow: hidden; }
+            .back-page .dotted-line { text-align: center; letter-spacing: 1px; font-size: 10pt; margin-top: 18mm; white-space: nowrap; overflow: hidden; }
             .back-page .dotted-gap { height: 6mm; }
             .back-page .sig-jab { font-size: 8.5pt; line-height: 1.35; text-align: center; font-weight: normal; word-wrap: break-word; overflow-wrap: break-word; }
             .back-page .sig-name { font-weight: bold; text-decoration: underline; font-size: 10.5pt; line-height: 1.35; text-align: center; }
@@ -118,15 +118,15 @@
             $kecamatanNama = $kecamatanRaw !== '' ? 'Kec. ' . $kecamatanRaw : '';
             $desaRaw = trim((string) ($spt->desa ?? ''));
             $desaNama = $desaRaw !== '' ? 'Desa ' . $desaRaw : '';
-            $parts = array_filter([$kecamatanNama, $desaNama, $tempatKegiatan], fn($v) => $v !== '');
+            $parts = array_filter([ $desaNama, $kecamatanNama], fn($v) => $v !== '');
             $tujuan = $parts ? implode(', ', $parts) : '-';
             // Split Row II - Dalam Daerah: Kiri=Kec, Kanan=Desa
             $tujuanTibaKiri = $kecamatanNama !== '' ? $kecamatanNama : '-';
             $tujuanTibaKanan = $desaNama !== '' ? $desaNama : '-';
         } else {
             $kotaNama = $spt?->kotaTujuan?->nama ?? '';
-            $parts = array_filter([$kotaNama, $tempatKegiatan], fn($v) => $v !== '');
-            $tujuan = $parts ? implode(' - ', $parts) : '-';
+            $parts = array_filter([$kotaNama], fn($v) => $v !== '');
+            $tujuan = $parts ? implode(', ', $parts) : '-';
             $tujuanTibaKiri = $kotaNama !== '' ? $kotaNama : '-';
             $tujuanTibaKanan = $tempatKegiatan !== '' ? $tempatKegiatan : '-';
         }
@@ -152,7 +152,7 @@
                 @else
                     Kepala Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Balangan
                 @endif
-            </td>
+            </td>   
         </tr>
         <tr>
             <td class="left-cell cell" style="height:10mm;">
@@ -161,7 +161,7 @@
             <td class="right-cell cell" style="height:10mm;">{{ $pegawai?->nama ?? '-' }} / NIP. {{ $pegawai?->nip ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="left-cell cell" style="height:24mm;">
+            <td class="left-cell cell" style="height:20mm;">
                 <table class="inner-num-table"><tr><td class="num">3</td><td class="label-text"><div class="sub-line"><span class="sub-marker">a.</span><span class="sub-gap"></span>Pangkat dan Golongan</div><div class="sub-line"><span class="sub-marker">b.</span><span class="sub-gap"></span>Jabatan/Instansi</div><div class="sub-line"><span class="sub-marker">c.</span><span class="sub-gap"></span>Tingkat Biaya Perjalanan Dinas</div></td></tr></table>
             </td>
             <td class="right-cell cell" style="height:24mm;">
@@ -197,7 +197,7 @@
             </td>
         </tr>
         <tr>
-            <td class="left-cell cell" style="height:28mm;">
+            <td class="left-cell cell" style="height:20mm;">
                 <table class="inner-num-table"><tr><td class="num">8</td><td class="label-text"><div class="sub-line">Pengikut : Nama</div><div class="sub-line"><span class="sub-marker">1.</span><span class="sub-gap"></span></div><div class="sub-line"><span class="sub-marker">2.</span><span class="sub-gap"></span></div><div class="sub-line"><span class="sub-marker">3.</span><span class="sub-gap"></span></div></td></tr></table>
             </td>
             <td class="right-cell cell" style="height:28mm; padding:0;">
@@ -269,30 +269,30 @@
             </td>
         </tr>
         <tr>
-            <td class="blk-l" style="height:38mm;">
+            <td class="blk-l" style="height:55mm;">
                 <table class="f-tbl">
                     <tr><td class="c-lab nowrap">II. Tiba di</td><td class="c-sep">:</td><td class="c-val">{{ $tujuanTibaKiri }}</td></tr>
                     <tr><td class="c-lab pada-tanggal">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</td></tr>
                 </table>
-                <div style="height:17mm;"></div>
+                <div style="height:25mm;"></div>
                 <div class="dotted-line">.............................................</div>
             </td>
-            <td class="blk-r" style="height:38mm;">
+            <td class="blk-r" style="height:55mm;">
                 <table class="f-tbl">
                     <tr><td class="c-lab nowrap">Tiba di</td><td class="c-sep">:</td><td class="c-val">{{ $tujuanTibaKanan }}</td></tr>
-                    <tr><td class="c-lab nowrap">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_kembali?->translatedFormat('d F Y') ?? '-' }}</td></tr>
+                    <tr><td class="c-lab nowrap">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">{{ $sppd->tanggal_berangkat?->translatedFormat('d F Y') ?? '-' }}</td></tr>
                 </table>
-                <div style="height:17mm;"></div>
+                <div style="height:25mm;"></div>
                 <div class="dotted-line">.............................................</div>
             </td>
         </tr>
         <tr>
-            <td class="blk-l" style="height:36mm;">
+            <td class="blk-l" style="height:55mm;">
                 <table class="f-tbl">
                     <tr><td class="c-lab nowrap">III. Tiba di</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
                     <tr><td class="c-lab pada-tanggal-3">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
                 </table>
-                <div style="height:17mm;"></div>
+                <div style="height:25mm;"></div>
                 <div class="dotted-line">.............................................</div>
             </td>
             <td class="blk-r" style="height:36mm;">
@@ -300,7 +300,7 @@
                     <tr><td class="c-lab nowrap">Tiba di</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
                     <tr><td class="c-lab nowrap">Pada Tanggal</td><td class="c-sep">:</td><td class="c-val">&nbsp;</td></tr>
                 </table>
-                <div style="height:17mm;"></div>
+                <div style="height:25mm;"></div>
                 <div class="dotted-line">.............................................</div>
             </td>
         </tr>

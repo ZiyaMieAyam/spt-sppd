@@ -163,12 +163,8 @@
                         @php
                             $fmtBerangkat = \Carbon\Carbon::parse($lastJadwal->tanggal_berangkat)->locale('id')->translatedFormat('d F Y');
                             $fmtKembali = \Carbon\Carbon::parse($lastJadwal->tanggal_kembali)->locale('id')->translatedFormat('d F Y');
-                            $fmtNext = isset($nextAvailable) && $nextAvailable ? \Carbon\Carbon::parse($nextAvailable)->locale('id')->translatedFormat('d F Y') : null;
                         @endphp
                         <span>Jadwal perjalanan dinas terakhir: {{ $fmtBerangkat }} s/d {{ $fmtKembali }}</span>
-                        @if($fmtNext)
-                            <span>Tanggal tersedia berikutnya: {{ $fmtNext }}</span>
-                        @endif
                     @else
                         <span>Belum ada jadwal perjalanan dinas.</span>
                     @endif
@@ -275,16 +271,18 @@
                     <div class="form-group">
 
                         <label for="desa">
-                            Desa
+                            Desa/Kelurahan
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             name="desa"
                             id="desa"
-                            value="{{ old('desa', $spt->desa ?? '') }}"
-                            placeholder="Masukkan nama desa"
+                            class="searchable"
                         >
+                            <option value="">
+                                Pilih desa/kelurahan
+                            </option>
+                        </select>
 
                         @error('desa')
                             <span class="field-error">{{ $message }}</span>
@@ -734,15 +732,77 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /*
     |--------------------------------------------------------------------------
-    | KECAMATAN
+    | DESA/KELURAHAN DEPENDENT ON KECAMATAN
     |--------------------------------------------------------------------------
     */
 
-    new TomSelect('#kecamatan_id', {
+    const desaByKecamatan = @json(
+        $kecamatans->mapWithKeys(function ($k) {
+            return [$k->id => $k->desas->pluck('nama')->sort()->values()->toArray()];
+        })->toArray()
+    );
+
+    const desaSelected = @json(old('desa', $spt->desa ?? ''));
+
+    const kecamatanEl = document.getElementById('kecamatan_id');
+    const desaEl = document.getElementById('desa');
+
+    const tomDesa = new TomSelect('#desa', {
+        create: false,
+        placeholder: 'Pilih desa/kelurahan',
+        searchField: ['text'],
+        maxOptions: 300,
+    });
+
+    function populateDesa(kecamatanId, keepSelected = false) {
+        const list = desaByKecamatan[kecamatanId] || [];
+        const currentValue = keepSelected ? tomDesa.getValue() : null;
+
+        tomDesa.clear();
+        tomDesa.clearOptions();
+
+        tomDesa.addOption({value: '', text: 'Pilih desa/kelurahan'});
+
+        list.forEach(function (nama) {
+            tomDesa.addOption({value: nama, text: nama});
+        });
+
+        tomDesa.refreshOptions(false);
+
+        // Tentukan nilai yang harus dipilih
+        let targetValue = '';
+        if (keepSelected && currentValue && list.includes(currentValue)) {
+            targetValue = currentValue;
+        } else if (!keepSelected && desaSelected && list.includes(desaSelected)) {
+            // Initial load: gunakan old/spt value jika cocok dengan kecamatan
+            targetValue = desaSelected;
+        }
+
+        if (targetValue) {
+            tomDesa.setValue(targetValue, true);
+        } else {
+            tomDesa.setValue('', true);
+        }
+    }
+
+    // TomSelect untuk Kecamatan - dengan callback ganti desa
+    const tomKecamatan = new TomSelect('#kecamatan_id', {
         create: false,
         placeholder: 'Cari kecamatan...',
-        searchField: ['text']
+        searchField: ['text'],
+        onChange: function (value) {
+            // Reset desa ketika kecamatan diganti, jangan pertahankan pilihan lama
+            populateDesa(value, false);
+        }
     });
+
+    // Init desa berdasarkan kecamatan terpilih saat load (edit / old input)
+    const initialKecamatanId = kecamatanEl.value || tomKecamatan.getValue();
+    if (initialKecamatanId) {
+        populateDesa(initialKecamatanId, false);
+        // Jika editing dan desaSelected tidak ada di list (kecamatan tidak cocok), tetap kosong
+        // Jika desaSelected kosong (create), tetap kosong
+    }
 
     /*
     |--------------------------------------------------------------------------

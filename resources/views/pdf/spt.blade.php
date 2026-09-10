@@ -314,13 +314,13 @@
             @php
                 $tk = trim((string) ($spt->tempat_kegiatan ?? ''));
                 if ($spt->jenis_perjalanan === 'Dalam Daerah') {
-                    $kec = $spt->kecamatan?->nama ? 'Kec. ' . $spt->kecamatan->nama : '';
                     $des = $spt->desa ? 'Desa ' . $spt->desa : '';
-                    $p = array_filter([$kec, $des, $tk], fn($v) => $v !== '');
-                    echo $p ? implode(' - ', $p) : '-';
+                    $kec = $spt->kecamatan?->nama ? 'Kec. ' . $spt->kecamatan->nama : '';
+                    $p = array_filter([$des, $kec], fn($v) => $v !== '');
+                    echo $p ? implode(', ', $p) : '-';
                 } else {
                     $kota = $spt->kotaTujuan?->nama ?? '';
-                    $p = array_filter([$kota, $tk], fn($v) => $v !== '');
+                    $p = array_filter([$kota], fn($v) => $v !== '');
                     echo $p ? implode(' - ', $p) : '-';
                 }
             @endphp

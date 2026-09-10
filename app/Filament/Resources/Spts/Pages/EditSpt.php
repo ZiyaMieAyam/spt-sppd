@@ -5,7 +5,6 @@ namespace App\Filament\Resources\Spts\Pages;
 use App\Filament\Resources\Spts\SptResource;
 use App\Models\Pegawai;
 use App\Models\Sppd;
-use App\Services\ScheduleOverlapService;
 use Carbon\Carbon;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -19,21 +18,6 @@ class EditSpt extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Validasi bentrok jadwal (exclude record sendiri agar tidak dianggap bentrok)
-        $berangkat = $data['tanggal_berangkat'] instanceof \DateTimeInterface
-            ? $data['tanggal_berangkat']->format('Y-m-d')
-            : (string) $data['tanggal_berangkat'];
-        $kembali = $data['tanggal_kembali'] instanceof \DateTimeInterface
-            ? $data['tanggal_kembali']->format('Y-m-d')
-            : (string) $data['tanggal_kembali'];
-
-        ScheduleOverlapService::assertNoOverlap(
-            $berangkat,
-            $kembali,
-            $this->record->id,
-            $data['pegawais'] ?? []
-        );
-
         $this->pegawaiIds = $data['pegawais'] ?? [];
 
         unset($data['pegawais']);

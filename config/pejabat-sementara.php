@@ -17,20 +17,26 @@ return [
     */
 
     'bupati' => [
-        'nama'  => 'H. ABDUL HADI, S.Ag., M.I.Kom.',
-        'nip'   => '197008141994031007',
+        'nama'  => 'H. Abdul Hadi, S.Ag., M.I.Kom.',
+        'nip'   => null,
+        'pangkat' => null,
+        'golongan' => null,
         'jabatan' => 'BUPATI BALANGAN',
     ],
 
     'wakil_bupati' => [
-        'nama'  => null,
+        'nama'  => 'H. Akhmad Fauzi, S.Pd.',
         'nip'   => null,
+        'pangkat' => null,
+        'golongan' => null,
         'jabatan' => 'WAKIL BUPATI BALANGAN',
     ],
 
     'sekda' => [
-        'nama'  => null,
-        'nip'   => null,
+        'nama'  => 'FAKHRIYANTO, S.Pt, MP',
+        'nip'   => '197806012005011016',
+        'pangkat' => 'Pembina Tk. I',
+        'golongan' => 'IV/b',
         'jabatan' => 'SEKRETARIS DAERAH KABUPATEN BALANGAN',
     ],
 
