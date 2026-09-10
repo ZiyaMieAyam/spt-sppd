@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Spts\Schemas;
 
-use App\Models\Pegawai;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -57,14 +56,14 @@ class SptInfolist
                             ->label('Kota Tujuan')
                             ->visible(fn ($record) => $record->jenis_perjalanan === 'Luar Daerah'),
 
-                TextEntry::make('pegawai')
-                    ->label('Pegawai Yang Ditugaskan')
-                    ->state(function ($record) {
-                        return $record->pegawais
-                            ->pluck('nama')
-                            ->implode(', ');
-                    })
-                    ->columnSpanFull(),
+                        TextEntry::make('pegawai')
+                            ->label('Pegawai Yang Ditugaskan')
+                            ->state(function ($record) {
+                                return $record->pegawais
+                                    ->pluck('nama')
+                                    ->implode(', ');
+                            })
+                            ->columnSpanFull(),
 
                     ]),
             ]);

@@ -51,7 +51,7 @@ class PegawaiSorter
      * lalu Jabatan sebagai tie-breaker (a-z). usort pada PHP 8 stabil,
      * pegawai dengan golongan & jabatan sama mempertahankan urutan lama.
      *
-     * @param iterable<Pegawai> $pegawais
+     * @param  iterable<Pegawai>  $pegawais
      */
     public static function urutkan(iterable $pegawais): Collection
     {

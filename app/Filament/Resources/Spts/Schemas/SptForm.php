@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Spts\Schemas;
 
 use App\Models\Desa;
 use App\Models\Pegawai;
+use App\Models\Spt;
 use App\Services\ScheduleOverlapService;
 use Closure;
 use Filament\Forms\Components\DatePicker;
@@ -51,13 +52,13 @@ class SptForm
                     ->label('')
                     ->content(function (?Model $record): HtmlString {
                         $last = ScheduleOverlapService::getLastPerjalananDinas($record?->id);
-                        if (!$last) {
+                        if (! $last) {
                             return new HtmlString('<span style="font-size:11.5px;color:#6b7280;">Belum ada jadwal perjalanan dinas.</span>');
                         }
                         $fmtBerangkat = ScheduleOverlapService::formatTanggalIndo($last->tanggal_berangkat);
                         $fmtKembali = ScheduleOverlapService::formatTanggalIndo($last->tanggal_kembali);
                         $html = '<div style="font-size:11.5px;color:#6b7280;line-height:1.6;background:#f9fafb;border:1px solid #f3f4f6;border-radius:6px;padding:9px 12px;">';
-                        $html .= '<span>Jadwal perjalanan dinas terakhir: ' . e($fmtBerangkat) . ' s/d ' . e($fmtKembali) . '</span>';
+                        $html .= '<span>Jadwal perjalanan dinas terakhir: '.e($fmtBerangkat).' s/d '.e($fmtKembali).'</span>';
                         $html .= '</div>';
 
                         return new HtmlString($html);
@@ -93,6 +94,7 @@ class SptForm
                         if (! $kecamatanId) {
                             return [];
                         }
+
                         return Desa::where('kecamatan_id', $kecamatanId)
                             ->orderBy('nama')
                             ->pluck('nama', 'nama')
@@ -147,7 +149,7 @@ class SptForm
                     ->options(
                         Pegawai::orderBy('nama')->pluck('nama', 'id')
                     )
-                    ->afterStateHydrated(function (Select $component, ?\App\Models\Spt $record) {
+                    ->afterStateHydrated(function (Select $component, ?Spt $record) {
                         if ($record) {
                             $component->state(
                                 $record->pegawais()

@@ -392,7 +392,7 @@ class PegawaiSeeder extends Seeder
 
         // Cari ID pegawai dummy yang akan dihapus
         $dummyIds = Pegawai::whereNotIn('nip', $validNips)->pluck('id')->all();
-        if (!empty($dummyIds)) {
+        if (! empty($dummyIds)) {
             // Hapus sppds yang referensi ke pegawai dummy (cascade manual)
             DB::table('sppds')->whereIn('pegawai_id', $dummyIds)->delete();
             // Hapus pegawai dummy

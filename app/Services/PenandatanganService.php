@@ -47,14 +47,14 @@ class PenandatanganService
      * Tanpa aturan di config => semua penandatangan diizinkan
      * (aman secara default).
      *
-     * @param iterable<Pegawai> $pegawais
+     * @param  iterable<Pegawai>  $pegawais
      * @return list<string>
      */
     public static function yangDiizinkan(iterable $pegawais): array
     {
         $aturan = Config::get('penandatangan.aturan_jabatan');
 
-        if (!is_array($aturan) || $aturan === []) {
+        if (! is_array($aturan) || $aturan === []) {
             return self::kunci();
         }
 
@@ -62,7 +62,7 @@ class PenandatanganService
 
         foreach ($pegawais as $pegawai) {
             foreach ($aturan as $rule) {
-                if (!self::jabatanCocok((string) $pegawai->jabatan, $rule['cocok_jabatan'] ?? [])) {
+                if (! self::jabatanCocok((string) $pegawai->jabatan, $rule['cocok_jabatan'] ?? [])) {
                     continue;
                 }
 
@@ -82,7 +82,7 @@ class PenandatanganService
     /**
      * Apakah pilihan penandatangan valid untuk pegawai-pegawai ini?
      *
-     * @param iterable<Pegawai> $pegawais
+     * @param  iterable<Pegawai>  $pegawais
      */
     public static function valid(string $kunci, iterable $pegawais): bool
     {

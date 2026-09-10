@@ -42,7 +42,7 @@ class SptPdfController extends Controller
 
         $pegawais = $this->pegawaiTerurut($spt);
 
-        if (!PenandatanganService::valid($kunci, $pegawais)) {
+        if (! PenandatanganService::valid($kunci, $pegawais)) {
             return $this->redirectBelumPilih($spt)
                 ->with('error', 'Penandatangan tersebut tidak diizinkan untuk jabatan pegawai yang ditugaskan.');
         }
@@ -59,7 +59,7 @@ class SptPdfController extends Controller
             ...$this->variabelKop($definisi),
         ]);
 
-        return $this->stream($pdf, 'SPT-' . $spt->id . '.pdf');
+        return $this->stream($pdf, 'SPT-'.$spt->id.'.pdf');
     }
 
     private function pegawaiTerurut(Spt $spt)
@@ -129,7 +129,7 @@ class SptPdfController extends Controller
         $sementara = Config::get("pejabat-sementara.{$sementaraKey}", []);
 
         foreach (['nama', 'nip', 'pangkat', 'golongan', 'jabatan'] as $field) {
-            if (empty($definisi[$field]) && !empty($sementara[$field])) {
+            if (empty($definisi[$field]) && ! empty($sementara[$field])) {
                 $definisi[$field] = $sementara[$field];
             }
         }

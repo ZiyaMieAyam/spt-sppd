@@ -14,15 +14,12 @@
     @endif
 
     <div class="card">
-
         <div class="card-header">
             <h2>{{ $sppd ? 'Cetak SPPD' : 'Cetak SPT' }}</h2>
         </div>
 
         <div class="card-body">
-
             <div class="info-dokumen">
-
                 <div class="info-row">
                     <span class="info-label">Nomor {{ $sppd ? 'SPPD' : 'SPT' }}</span>
                     <span class="info-nilai">{{ $sppd ? ($sppd->nomor_sppd ?? '-') : $spt->nomor_spt }}</span>
@@ -44,13 +41,10 @@
                     <span class="info-label">Pegawai Ditugaskan</span>
                     <span class="info-nilai">{{ $pegawais->count() }} orang</span>
                 </div>
-
             </div>
 
             @if($pegawais->isNotEmpty())
-
                 <div class="daftar-pegawai">
-
                     <h3>Daftar Pegawai (urut golongan)</h3>
 
                     <ol>
@@ -62,73 +56,47 @@
                             </li>
                         @endforeach
                     </ol>
-
                 </div>
-
             @endif
 
             @if($penandatanganDiizinkan === [])
-
                 <div class="alert-error">
                     Tidak ada penandatangan yang diizinkan untuk jabatan pegawai yang ditugaskan.
                     Hubungi administrator.
                 </div>
-
             @else
-
                 <form
                     method="GET"
                     action="{{ $sppd ? route('sppds.pdf', $sppd->id) : route('spts.pdf', $spt->id) }}"
                     target="_blank"
                 >
-
                     <div class="form-group">
-
                         <label for="penandatangan">Penandatangan</label>
 
-                        <select
-                            id="penandatangan"
-                            name="penandatangan"
-                            required
-                        >
-
-                            <option
-                                value=""
-                                disabled
-                                selected
-                            >
+                        <select id="penandatangan" name="penandatangan" required>
+                            <option value="" disabled selected>
                                 -- Pilih Penandatangan --
                             </option>
 
                             @foreach($semuaPenandatangan as $kunci => $definisi)
-
                                 @if(in_array($kunci, $penandatanganDiizinkan, true))
-
                                     <option value="{{ $kunci }}">
                                         {{ $definisi['jabatan'] }}
                                         @if($definisi['nama'])
                                             &mdash; {{ $definisi['nama'] }}
                                         @endif
                                     </option>
-
                                 @endif
-
                             @endforeach
-
                         </select>
-
                     </div>
 
                     <button type="submit" class="btn-cetak">
                         Cetak PDF
                     </button>
-
                 </form>
-
             @endif
-
         </div>
-
     </div>
 
 @endsection
@@ -136,7 +104,6 @@
 @push('styles')
 
 <style>
-
     .card {
         overflow: hidden;
         max-width: 640px;
@@ -259,7 +226,6 @@
     .btn-cetak:hover {
         background: #1d4ed8;
     }
-
 </style>
 
 @endpush

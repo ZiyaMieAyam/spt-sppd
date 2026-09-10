@@ -9,7 +9,7 @@ return new class extends Migration
     {
         // Tambah enum PPPK dan buat pangkat nullable agar PPPK bisa NULL (tidak mengarang pangkat)
         DB::statement("ALTER TABLE `pegawais` MODIFY COLUMN `status` ENUM('ASN','Non ASN','PPPK') NOT NULL DEFAULT 'ASN'");
-        DB::statement("ALTER TABLE `pegawais` MODIFY COLUMN `pangkat` VARCHAR(255) NULL");
+        DB::statement('ALTER TABLE `pegawais` MODIFY COLUMN `pangkat` VARCHAR(255) NULL');
     }
 
     public function down(): void
@@ -20,6 +20,6 @@ return new class extends Migration
         // Jika ada PPPK, ubah ke ASN sebelum revert enum
         DB::table('pegawais')->where('status', 'PPPK')->update(['status' => 'ASN']);
         DB::statement("ALTER TABLE `pegawais` MODIFY COLUMN `status` ENUM('ASN','Non ASN') NOT NULL DEFAULT 'ASN'");
-        DB::statement("ALTER TABLE `pegawais` MODIFY COLUMN `pangkat` VARCHAR(255) NOT NULL");
+        DB::statement('ALTER TABLE `pegawais` MODIFY COLUMN `pangkat` VARCHAR(255) NOT NULL');
     }
 };

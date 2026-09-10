@@ -6,6 +6,7 @@ use App\Models\Sppd;
 use App\Models\Spt;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 
 class ScheduleOverlapService
 {
@@ -25,9 +26,9 @@ class ScheduleOverlapService
      * Cek bentrok global berdasarkan tabel SPT.
      * Mengembalikan SPT yang pertama kali bentrok atau null jika tidak ada.
      *
-     * @param string $tanggalBerangkat  Y-m-d
-     * @param string $tanggalKembali    Y-m-d
-     * @param int|null $excludeSptId   ID SPT yang sedang diedit (agar tidak dianggap bentrok dengan dirinya sendiri)
+     * @param  string  $tanggalBerangkat  Y-m-d
+     * @param  string  $tanggalKembali  Y-m-d
+     * @param  int|null  $excludeSptId  ID SPT yang sedang diedit (agar tidak dianggap bentrok dengan dirinya sendiri)
      */
     public static function findConflictSpt(
         string $tanggalBerangkat,
@@ -47,7 +48,7 @@ class ScheduleOverlapService
      * Berguna jika validasi ingin lebih granular per pegawai.
      * Mengembalikan SPPD yang bentrok atau null.
      *
-     * @param array<int> $pegawaiIds
+     * @param  array<int>  $pegawaiIds
      */
     public static function findConflictSppdPerPegawai(
         string $tanggalBerangkat,
@@ -86,7 +87,7 @@ class ScheduleOverlapService
         ?int $excludeSppdId = null
     ): ?array {
         // Jika ada pegawaiIds, cek per-pegawai dulu agar pesan bisa menyebut pegawai
-        if (!empty($pegawaiIds)) {
+        if (! empty($pegawaiIds)) {
             $sppd = self::findConflictSppdPerPegawai(
                 $tanggalBerangkat,
                 $tanggalKembali,
@@ -138,7 +139,7 @@ class ScheduleOverlapService
         $mulai = self::formatTanggalIndo($berangkat);
         $selesai = self::formatTanggalIndo($kembali);
 
-        $pegawai = $sppd->pegawai?->nama ? " (pegawai: {$sppd->pegawai->nama})" : "";
+        $pegawai = $sppd->pegawai?->nama ? " (pegawai: {$sppd->pegawai->nama})" : '';
 
         return "Jadwal perjalanan dinas bentrok dengan SPPD yang sudah ada pada tanggal {$mulai} s/d {$selesai}{$pegawai}.";
     }
@@ -148,7 +149,7 @@ class ScheduleOverlapService
      */
     public static function formatTanggalIndo(Carbon|string|null $tanggal): string
     {
-        if (!$tanggal) {
+        if (! $tanggal) {
             return '-';
         }
 
@@ -191,12 +192,10 @@ class ScheduleOverlapService
     /**
      * Tanggal tersedia berikutnya = tanggal_kembali jadwal terakhir + 1 hari.
      * Menerima Spt atau Sppd agar kompatibel dengan kedua sumber data.
-     *
-     * @param Spt|Sppd|null $last
      */
     public static function getNextAvailableDate(Spt|Sppd|null $last): ?Carbon
     {
-        if (!$last || !$last->tanggal_kembali) {
+        if (! $last || ! $last->tanggal_kembali) {
             return null;
         }
 
@@ -220,7 +219,7 @@ class ScheduleOverlapService
         $conflict = self::findConflict($tanggalBerangkat, $tanggalKembali, $excludeSptId, $pegawaiIds, $excludeSppdId);
 
         if ($conflict) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
+            throw ValidationException::withMessages([
                 'tanggal_berangkat' => $conflict['message'],
                 'tanggal_kembali' => $conflict['message'],
             ]);

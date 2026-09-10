@@ -17,32 +17,32 @@ return [
     */
 
     'bupati' => [
-        'nama'  => 'H. Abdul Hadi, S.Ag., M.I.Kom.',
-        'nip'   => null,
+        'nama' => 'H. Abdul Hadi, S.Ag., M.I.Kom.',
+        'nip' => null,
         'pangkat' => null,
         'golongan' => null,
         'jabatan' => 'BUPATI BALANGAN',
     ],
 
     'wakil_bupati' => [
-        'nama'  => 'H. Akhmad Fauzi, S.Pd.',
-        'nip'   => null,
+        'nama' => 'H. Akhmad Fauzi, S.Pd.',
+        'nip' => null,
         'pangkat' => null,
         'golongan' => null,
         'jabatan' => 'WAKIL BUPATI BALANGAN',
     ],
 
     'sekda' => [
-        'nama'  => 'FAKHRIYANTO, S.Pt, MP',
-        'nip'   => '197806012005011016',
+        'nama' => 'FAKHRIYANTO, S.Pt, MP',
+        'nip' => '197806012005011016',
         'pangkat' => 'Pembina Tk. I',
         'golongan' => 'IV/b',
         'jabatan' => 'SEKRETARIS DAERAH KABUPATEN BALANGAN',
     ],
 
     'kepala_diskominfo' => [
-        'nama'  => 'H. Syaifuddin Tailah, S.Pd, MM',
-        'nip'   => '196704031994031015',
+        'nama' => 'H. Syaifuddin Tailah, S.Pd, MM',
+        'nip' => '196704031994031015',
         'pangkat' => 'Pembina Utama Muda',
         'golongan' => 'IV/c',
         'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
@@ -59,8 +59,8 @@ return [
     */
 
     'kepala_dinas' => [
-        'nama'  => 'H. Syaifuddin Tailah, S.Pd, MM',
-        'nip'   => '196704031994031015',
+        'nama' => 'H. Syaifuddin Tailah, S.Pd, MM',
+        'nip' => '196704031994031015',
         'pangkat' => 'Pembina Utama Muda',
         'golongan' => 'IV/c',
         'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
@@ -78,8 +78,8 @@ return [
     */
 
     'pejabat_teknis' => [
-        'nama'  => 'MAHPUDZ AMIN, SE',
-        'nip'   => '198502142010011016',
+        'nama' => 'MAHPUDZ AMIN, SE',
+        'nip' => '198502142010011016',
         'pangkat' => 'Penata',
         'golongan' => 'III/c',
         'jabatan' => 'KEPALA SUB BAGIAN UMUM DAN KEPEGAWAIAN SELAKU PEJABAT PELAKSANA TEKNIS KEGIATAN',

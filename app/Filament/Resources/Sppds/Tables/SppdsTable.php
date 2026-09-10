@@ -45,7 +45,7 @@ class SppdsTable
                     ->getStateUsing(function ($record) {
 
                         if ($record->spt->jenis_perjalanan == 'Dalam Daerah') {
-                            return $record->spt->kecamatan?->nama . ' - ' . $record->spt->desa;
+                            return $record->spt->kecamatan?->nama.' - '.$record->spt->desa;
                         }
 
                         return $record->spt->kotaTujuan?->nama;

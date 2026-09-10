@@ -46,6 +46,6 @@ class SppdPdfController extends Controller
 
         $dompdf->set_option('chroot', public_path());
 
-        return $pdf->stream('SPPD-' . $sppd->id . '.pdf');
+        return $pdf->stream('SPPD-'.$sppd->id.'.pdf');
     }
 }

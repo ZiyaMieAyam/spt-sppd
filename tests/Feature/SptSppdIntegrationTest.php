@@ -9,6 +9,7 @@ use App\Models\Sppd;
 use App\Models\Spt;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class SptSppdIntegrationTest extends TestCase
@@ -386,7 +387,7 @@ class SptSppdIntegrationTest extends TestCase
             ->assertSee('Desa Admin');
 
         // Admin mengedit — gunakan DB query langsung untuk memastikan persist
-        \Illuminate\Support\Facades\DB::table('spts')
+        DB::table('spts')
             ->where('id', $sptId)
             ->update([
                 'perihal' => 'Admin mengubah ini',

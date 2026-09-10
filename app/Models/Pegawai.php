@@ -31,4 +31,4 @@ class Pegawai extends Model
             'spt_id'
         );
     }
-}   
+}
