@@ -9,13 +9,17 @@ use App\Filament\Resources\Sppds\Schemas\SppdForm;
 use App\Filament\Resources\Sppds\Schemas\SppdInfolist;
 use App\Filament\Resources\Sppds\Tables\SppdsTable;
 use App\Models\Sppd;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class SppdResource extends Resource
 {
     protected static ?string $model = Sppd::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperAirplane;
 
     public static function form(Schema $schema): Schema
     {
