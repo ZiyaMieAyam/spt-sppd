@@ -99,7 +99,7 @@
         $kdPangkat = $penandatangan['pangkat'] ?? null;
         $kdGol     = $penandatangan['golongan'] ?? null;
         $sk        = config('pejabat-sementara.instansi.singkatan', 'DISKOMINFOSAN');
-        $pt        = config('pejabat-sementara.pejabat_teknis', []);
+        $pt        = \App\Services\PenandatanganService::cari('pejabat_teknis') ?? config('pejabat-sementara.pejabat_teknis', []);
         $namaPT    = $pt['nama'] ?? '';
         $nipPT     = $pt['nip'] ?? '';
         $pangkatPT = $pt['pangkat'] ?? '';

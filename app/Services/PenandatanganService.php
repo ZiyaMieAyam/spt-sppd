@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Pegawai;
+use App\Models\Penandatangan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 
@@ -11,10 +12,24 @@ class PenandatanganService
     /**
      * Semua penandatangan yang terdaftar: kunci => definisi.
      *
+     * Sumber utama adalah tabel `penandatangans` (dikelola via Filament);
+     * config lama dipakai sebagai fallback bila tabel kosong/belum ada.
+     * Hanya baris yang memiliki `kop` yang ditampilkan sebagai
+     * pilihan penandatangan SPT (baris tanpa kop khusus untuk SPPD).
+     *
      * @return array<string, array{jabatan: string, nama: ?string, nip: ?string, kop: string}>
      */
     public static function semua(): array
     {
+        $db = self::barisDatabase();
+
+        if ($db !== []) {
+            return array_filter(
+                $db,
+                fn (array $definisi): bool => filled($definisi['kop'] ?? null)
+            );
+        }
+
         return (array) Config::get('penandatangan.penandatangan', []);
     }
 
@@ -30,14 +45,76 @@ class PenandatanganService
 
     /**
      * Ambil satu definisi penandatangan berdasarkan kuncinya.
+     *
+     * Urutan pencarian: pilihan SPT dari database, baris khusus
+     * (mis. kepala_dinas, pejabat_teknis) dari database, lalu
+     * config lama sebagai fallback.
      */
     public static function cari(?string $kunci): ?array
     {
-        if ($kunci === null) {
+        if ($kunci === null || $kunci === '') {
             return null;
         }
 
-        return self::semua()[$kunci] ?? null;
+        $semua = self::semua();
+
+        if (isset($semua[$kunci])) {
+            return $semua[$kunci];
+        }
+
+        $db = self::barisDatabase();
+
+        if (isset($db[$kunci])) {
+            return $db[$kunci];
+        }
+
+        $config = (array) Config::get('penandatangan.penandatangan', []);
+
+        if (isset($config[$kunci])) {
+            return $config[$kunci];
+        }
+
+        $sementara = (array) Config::get(
+            'pejabat-sementara.'.str_replace('-', '_', $kunci),
+            []
+        );
+
+        return $sementara !== [] ? $sementara : null;
+    }
+
+    /**
+     * Seluruh baris tabel penandatangans dalam format definisi,
+     * dikunci berdasarkan kolom `kunci`. Mengembalikan array kosong
+     * bila tabel belum ada atau belum berisi data.
+     *
+     * @return array<string, array>
+     */
+    private static function barisDatabase(): array
+    {
+        try {
+            $rows = Penandatangan::query()->orderBy('id')->get();
+        } catch (\Throwable) {
+            return [];
+        }
+
+        if ($rows->isEmpty()) {
+            return [];
+        }
+
+        $hasil = [];
+
+        foreach ($rows as $row) {
+            $hasil[$row->kunci] = [
+                'jabatan' => (string) $row->jabatan,
+                'nama' => $row->nama,
+                'nip' => $row->nip,
+                'pangkat' => $row->pangkat,
+                'golongan' => $row->golongan,
+                'kop' => $row->kop,
+            ];
+        }
+
+        return $hasil;
     }
 
     /**

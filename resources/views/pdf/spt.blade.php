@@ -46,9 +46,11 @@
         .pegawai-nama { font-weight: bold; }
 
         /* ==== DASAR ==== */
-        .dasar-section { margin-top: 12px; margin-bottom: 8px; }
-        .dasar-label { font-weight: bold; margin-bottom: 2px; }
-        .dasar-content { margin-left: 0; line-height: 1.5; white-space: pre-wrap; }
+
+        .dasar-table td { vertical-align: top; padding: 2px 0; font-size: 11pt; }
+        .dasar-label { width: 80px; font-weight: bold; padding-left: 12px; }
+        .dasar-titik { width: 20px; padding-left: 4px; padding-right: 4px; }
+        .dasar-content { line-height: 1.5; white-space: pre-wrap; padding-right: 12px; }
 
         /* ==== DETAIL TUGAS ==== */
         .detail { width: 100%; border-collapse: collapse; margin-top: 8px; }
@@ -70,10 +72,13 @@
     </div>
 
     @if(!empty($spt->dasar))
-        <div class="dasar-section">
-            <div class="dasar-label">Dasar</div>
-            <div class="dasar-content">{!! nl2br(e($spt->dasar)) !!}</div>
-        </div>
+        <table class="dasar-table">
+            <tr>
+                <td class="dasar-label">Dasar</td>
+                <td class="dasar-titik">:</td>
+                <td class="dasar-content">{!! nl2br(e($spt->dasar)) !!}</td>
+            </tr>
+        </table>
     @endif
 
     {{-- Menugaskan --}}

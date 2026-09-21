@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sppd;
+use App\Services\PenandatanganService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Config;
 
@@ -16,7 +17,7 @@ class SppdPdfController extends Controller
             'spt.kotaTujuan',
         ]);
 
-        $penandatangan = Config::get('pejabat-sementara.kepala_dinas', [
+        $penandatangan = PenandatanganService::cari('kepala_dinas') ?? Config::get('pejabat-sementara.kepala_dinas', [
             'nama' => null,
             'nip' => null,
             'jabatan' => 'KEPALA DINAS KOMUNIKASI, INFORMATIKA, STATISTIK DAN PERSANDIAN KABUPATEN BALANGAN',
