@@ -18,6 +18,29 @@ class ListPegawais extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('downloadTemplate')
+                ->label('Download Template Excel')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('info')
+                ->action(function () {
+                    $path = storage_path('app/templates/Template_Data_Pegawai.xlsx');
+
+                    if (! file_exists($path)) {
+                        Notification::make()
+                            ->title('Template tidak ditemukan.')
+                            ->body('File Template_Data_Pegawai.xlsx tidak tersedia di server.')
+                            ->danger()
+                            ->send();
+
+                        return;
+                    }
+
+                    return response()->download(
+                        $path,
+                        'Template_Data_Pegawai.xlsx',
+                        ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+                    );
+                }),
             Action::make('import')
                 ->label('Import Excel')
                 ->icon('heroicon-o-arrow-up-tray')
