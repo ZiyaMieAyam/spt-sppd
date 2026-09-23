@@ -90,7 +90,9 @@
     </style>
 </head>
 <body>
-    @include('pdf.partials.kop')
+        @include('pdf.partials.kop', [
+        'penandatangan' => ['kop' => 'diskominfo']
+    ])
 
     @php
         $kdNama    = $penandatangan['nama'] ?? null;
