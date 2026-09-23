@@ -105,12 +105,12 @@ Route::middleware('auth')->group(function () {
 
     });
 
-    Route::get('/admin/spts/{spt}/pdf/pilih', [
+    Route::get('/spts/{spt}/pdf/pilih', [
         SptPdfController::class,
         'pilih',
     ])->name('spts.pdf.pilih');
 
-    Route::get('/admin/spts/{spt}/pdf', [
+    Route::get('/spts/{spt}/pdf', [
         SptPdfController::class,
         'generate',
     ])->name('spts.pdf');

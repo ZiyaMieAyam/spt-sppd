@@ -1,5 +1,4 @@
 <style>
-
     @page {
         size: A4 portrait;
         margin: 20mm 18mm 18mm 20mm;
@@ -208,5 +207,4 @@
     .nip {
         margin-top: 2px;
     }
-
 </style>

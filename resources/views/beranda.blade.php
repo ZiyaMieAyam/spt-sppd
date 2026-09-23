@@ -27,7 +27,6 @@
 
     </div>
 
-
     <div class="stats-grid">
 
         <div class="stat-card">
@@ -46,7 +45,6 @@
 
         </div>
 
-
         <div class="stat-card">
 
             <div class="stat-icon stat-icon--indigo">
@@ -64,7 +62,6 @@
 
         </div>
 
-
         <div class="stat-card">
 
             <div class="stat-icon stat-icon--sky">
@@ -80,7 +77,6 @@
             </div>
 
         </div>
-
 
         <div class="stat-card">
 
@@ -100,7 +96,6 @@
         </div>
 
     </div>
-
 
     <div class="section-head">
         <div>
@@ -129,7 +124,7 @@
 
                 <tbody>
 
-                    @forelse($terbaru as $spt)
+                    @forelse ($terbaru as $spt)
 
                         @php
                             $namaPegawai = $spt->pegawais->pluck('nama')->filter();
@@ -143,7 +138,7 @@
 
                             <td>
                                 {{ $pegawaiTampil ?: '-' }}
-                                @if($sisa > 0)
+                                @if ($sisa > 0)
                                     <span class="badge">+{{ $sisa }} lainnya</span>
                                 @endif
                             </td>
@@ -155,9 +150,9 @@
                             </td>
 
                             <td>
-                                @if($spt->jenis_perjalanan === 'Dalam Daerah')
+                                @if ($spt->jenis_perjalanan === 'Dalam Daerah')
                                     {{ $spt->kecamatan?->nama ?? '-' }}
-                                    @if($spt->desa)
+                                    @if ($spt->desa)
                                         <br>
                                         <small>{{ $spt->desa }}</small>
                                     @endif
@@ -201,7 +196,6 @@
 
     </div>
 
-
     <div class="quick-head">
         <h2>Aksi Cepat</h2>
     </div>
@@ -224,7 +218,6 @@
 
         </a>
 
-
         <a href="{{ route('dalam-daerah') }}" class="quick-card">
 
             <div class="quick-icon quick-icon--sky">
@@ -240,7 +233,6 @@
             </div>
 
         </a>
-
 
         <a href="{{ route('luar-daerah') }}" class="quick-card">
 
@@ -260,7 +252,6 @@
         </a>
 
     </div>
-
 
     <div class="card alur">
 
@@ -296,412 +287,423 @@
 
 @endsection
 
-
 @push('styles')
-
-<style>
-
-    .hero {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 40px;
-        text-align: center;
-        margin-bottom: 26px;
-    }
-
-    .hero-logo img {
-        width: 64px;
-        height: 64px;
-        object-fit: contain;
-        margin-bottom: 14px;
-    }
-
-    .hero h1 {
-        margin: 0 0 4px;
-        font-size: 30px;
-        font-weight: 700;
-        color: #111827;
-        letter-spacing: 1px;
-    }
-
-    .hero-sub {
-        margin: 0 0 14px;
-        font-size: 15px;
-        font-weight: 600;
-        color: #2563eb;
-    }
-
-    .hero-desc {
-        max-width: 620px;
-        margin: 0 auto 24px;
-        color: #6b7280;
-        font-size: 14px;
-        line-height: 1.6;
-    }
-
-    .btn-primary {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #2563eb;
-        color: #ffffff;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 600;
-        padding: 12px 22px;
-        border-radius: 8px;
-        border: 1px solid #2563eb;
-        transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-    }
-
-    .btn-primary:hover {
-        background: #1d4ed8;
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
-        transform: translateY(-1px);
-    }
-
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
-        margin-bottom: 32px;
-    }
-
-    .stat-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-        border-color: #cbd5e1;
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-
-    .stat-icon--blue { background: #eff6ff; color: #2563eb; }
-    .stat-icon--indigo { background: #eef2ff; color: #4f46e5; }
-    .stat-icon--sky { background: #f0f9ff; color: #0284c7; }
-    .stat-icon--cyan { background: #ecfeff; color: #0891b2; }
-
-    .stat-label {
-        margin: 0 0 3px;
-        font-size: 12px;
-        color: #6b7280;
-    }
-
-    .stat-value {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 700;
-        color: #111827;
-    }
-
-
-    .section-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 14px;
-    }
-
-    .section-head h2 {
-        margin: 0 0 3px;
-        font-size: 19px;
-    }
-
-    .section-head p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-
-    .card {
-        overflow: hidden;
-        margin-bottom: 32px;
-    }
-
-    .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th {
-        background: #f9fafb;
-        color: #374151;
-        font-size: 13px;
-        text-align: left;
-        padding: 13px 15px;
-        border-bottom: 1px solid #e5e7eb;
-        white-space: nowrap;
-    }
-
-    td {
-        padding: 13px 15px;
-        font-size: 13px;
-        border-bottom: 1px solid #f3f4f6;
-        white-space: nowrap;
-    }
-
-    tbody tr {
-        transition: background 0.15s ease;
-    }
-
-    tbody tr:hover {
-        background: #f9fafb;
-    }
-
-    td small {
-        color: #6b7280;
-    }
-
-    .badge {
-        display: inline-block;
-        margin-left: 6px;
-        background: #eff6ff;
-        color: #2563eb;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 2px 8px;
-        border-radius: 999px;
-    }
-
-    .tag {
-        display: inline-block;
-        font-size: 11px;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 999px;
-    }
-
-    .tag--dalam {
-        background: #dcfce7;
-        color: #15803d;
-    }
-
-    .tag--luar {
-        background: #ffedd5;
-        color: #c2410c;
-    }
-
-    .empty {
-        text-align: center;
-        color: #9ca3af;
-        padding: 35px;
-    }
-
-    .col-aksi {
-        width: 1%;
-        white-space: nowrap;
-        text-align: right;
-    }
-
-    .btn-print {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #2563eb;
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
-
-    .btn-print:hover {
-        background: #dbeafe;
-        border-color: #93c5fd;
-    }
-
-
-    .quick-head {
-        margin-bottom: 14px;
-    }
-
-    .quick-head h2 {
-        margin: 0;
-        font-size: 19px;
-    }
-
-    .quick-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 16px;
-        margin-bottom: 32px;
-    }
-
-    .quick-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        text-decoration: none;
-        color: #111827;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    }
-
-    .quick-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
-        border-color: #cbd5e1;
-    }
-
-    .quick-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: transform 0.2s ease;
-    }
-
-    .quick-card:hover .quick-icon {
-        transform: scale(1.06);
-    }
-
-    .quick-icon--blue { background: #eff6ff; color: #2563eb; }
-    .quick-icon--sky { background: #f0f9ff; color: #0284c7; }
-    .quick-icon--cyan { background: #ecfeff; color: #0891b2; }
-
-    .quick-content {
-        min-width: 0;
-    }
-
-    .quick-content h3 {
-        margin: 0 0 3px;
-        font-size: 15px;
-        font-weight: 600;
-    }
-
-    .quick-content p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 13px;
-        line-height: 1.4;
-    }
-
-
-    .alur {
-        padding: 22px 26px;
-    }
-
-    .alur-head {
-        padding-bottom: 16px;
-        border-bottom: 1px solid #e5e7eb;
-        margin-bottom: 16px;
-    }
-
-    .alur-head h2 {
-        margin: 0;
-        font-size: 17px;
-    }
-
-    .alur-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px 28px;
-    }
-
-    .alur-list li {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #374151;
-        font-size: 14px;
-    }
-
-    .alur-no {
-        width: 26px;
-        height: 26px;
-        flex-shrink: 0;
-        border-radius: 999px;
-        background: #eff6ff;
-        color: #2563eb;
-        font-size: 13px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-
-    @media (max-width: 900px) {
-
-        .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
+    <style>
+        .hero {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 26px;
         }
 
-    }
-
-    @media (max-width: 700px) {
-
-        .hero {
-            padding: 28px 18px;
+        .hero-logo img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            margin-bottom: 14px;
         }
 
         .hero h1 {
-            font-size: 24px;
+            margin: 0 0 4px;
+            font-size: 30px;
+            font-weight: 700;
+            color: #111827;
+            letter-spacing: 1px;
+        }
+
+        .hero-sub {
+            margin: 0 0 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .hero-desc {
+            max-width: 620px;
+            margin: 0 auto 24px;
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 22px;
+            border-radius: 8px;
+            border: 1px solid #2563eb;
+            transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+            transform: translateY(-1px);
         }
 
         .stats-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
         }
 
-        .quick-grid {
-            grid-template-columns: 1fr;
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+            border-color: #cbd5e1;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .stat-icon--blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .stat-icon--indigo {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .stat-icon--sky {
+            background: #f0f9ff;
+            color: #0284c7;
+        }
+
+        .stat-icon--cyan {
+            background: #ecfeff;
+            color: #0891b2;
+        }
+
+        .stat-label {
+            margin: 0 0 3px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .stat-value {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
         }
 
         .section-head {
-            align-items: flex-start;
-            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
         }
 
-        .alur-list {
-            grid-template-columns: 1fr;
+        .section-head h2 {
+            margin: 0 0 3px;
+            font-size: 19px;
+        }
+
+        .section-head p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .card {
+            overflow: hidden;
+            margin-bottom: 32px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 13px;
+            text-align: left;
+            padding: 13px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 15px;
+            font-size: 13px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.15s ease;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        td small {
+            color: #6b7280;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-left: 6px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .tag--dalam {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .tag--luar {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 35px;
+        }
+
+        .col-aksi {
+            width: 1%;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .btn-print:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+
+        .quick-head {
+            margin-bottom: 14px;
+        }
+
+        .quick-head h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .quick-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: #111827;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+            border-color: #cbd5e1;
+        }
+
+        .quick-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .quick-card:hover .quick-icon {
+            transform: scale(1.06);
+        }
+
+        .quick-icon--blue {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .quick-icon--sky {
+            background: #f0f9ff;
+            color: #0284c7;
+        }
+
+        .quick-icon--cyan {
+            background: #ecfeff;
+            color: #0891b2;
+        }
+
+        .quick-content {
+            min-width: 0;
+        }
+
+        .quick-content h3 {
+            margin: 0 0 3px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .quick-content p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.4;
         }
 
         .alur {
-            padding: 18px;
+            padding: 22px 26px;
         }
 
-    }
+        .alur-head {
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+        }
 
-</style>
+        .alur-head h2 {
+            margin: 0;
+            font-size: 17px;
+        }
 
+        .alur-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px 28px;
+        }
+
+        .alur-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .alur-no {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 900px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .hero {
+                padding: 28px 18px;
+            }
+
+            .hero h1 {
+                font-size: 24px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .alur-list {
+                grid-template-columns: 1fr;
+            }
+
+            .alur {
+                padding: 18px;
+            }
+        }
+    </style>
 @endpush

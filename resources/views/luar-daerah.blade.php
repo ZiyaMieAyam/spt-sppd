@@ -9,7 +9,7 @@
         <p>Data perjalanan dinas ke luar wilayah Kabupaten Balangan.</p>
     </div>
 
-    @if(session('success'))
+    @if (session('success'))
         <div class="alert-success">{{ session('success') }}</div>
     @endif
 
@@ -38,43 +38,29 @@
 
                 <tbody>
 
-                    @forelse($data as $index => $item)
+                    @forelse ($data as $index => $item)
 
                         <tr>
 
-                            <td class="col-no">
-                                {{ $index + 1 }}
-                            </td>
+                            <td class="col-no">{{ $index + 1 }}</td>
 
-                            <td>
-                                {{ $item->spt?->nomor_spt ?? '-' }}
-                            </td>
+                            <td>{{ $item->spt?->nomor_spt ?? '-' }}</td>
 
-                            <td>
-                                {{ $item->nomor_sppd ?? '-' }}
-                            </td>
+                            <td>{{ $item->nomor_sppd ?? '-' }}</td>
 
-                            <td>
-                                {{ $item->pegawai?->nama ?? '-' }}
-                            </td>
+                            <td>{{ $item->pegawai?->nama ?? '-' }}</td>
 
-                            <td>
-                                {{ $item->spt?->kotaTujuan?->nama ?? '-' }}
-                            </td>
+                            <td>{{ $item->spt?->kotaTujuan?->nama ?? '-' }}</td>
 
-                            <td>
-                                {{ $item->tanggal_berangkat?->translatedFormat('d M Y') ?? '-' }}
-                            </td>
+                            <td>{{ $item->tanggal_berangkat?->translatedFormat('d M Y') ?? '-' }}</td>
 
-                            <td>
-                                {{ $item->tanggal_kembali?->translatedFormat('d M Y') ?? '-' }}
-                            </td>
+                            <td>{{ $item->tanggal_kembali?->translatedFormat('d M Y') ?? '-' }}</td>
 
                             <td class="col-aksi">
 
                                 <div class="aksi-grup">
 
-                                    @if($item->spt)
+                                    @if ($item->spt)
 
                                         <a href="{{ route('spts.pdf.pilih', $item->spt->id) }}" target="_blank" class="btn-print" title="Cetak PDF SPT">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -123,122 +109,118 @@
 @endsection
 
 @push('styles')
+    <style>
+        .card {
+            overflow: hidden;
+        }
 
-<style>
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-    .card {
-        overflow: hidden;
-    }
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
 
-    .card-header {
-        padding: 20px 25px;
-        border-bottom: 1px solid #e5e7eb;
-    }
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
 
-    .card-header h2 {
-        margin: 0;
-        font-size: 18px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-    .table-wrapper {
-        width: 100%;
-        overflow-x: auto;
-    }
+        th {
+            background: #f9fafb;
+            color: #374151;
+            font-size: 13px;
+            text-align: left;
+            padding: 13px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+        td {
+            padding: 13px 15px;
+            font-size: 13px;
+            border-bottom: 1px solid #f3f4f6;
+            white-space: nowrap;
+        }
 
-    th {
-        background: #f9fafb;
-        color: #374151;
-        font-size: 13px;
-        text-align: left;
-        padding: 13px 15px;
-        border-bottom: 1px solid #e5e7eb;
-        white-space: nowrap;
-    }
+        .col-no {
+            width: 50px;
+            text-align: center;
+        }
 
-    td {
-        padding: 13px 15px;
-        font-size: 13px;
-        border-bottom: 1px solid #f3f4f6;
-        white-space: nowrap;
-    }
+        tbody tr {
+            transition: background 0.15s ease;
+        }
 
-    .col-no {
-        width: 50px;
-        text-align: center;
-    }
+        tbody tr:hover {
+            background: #f9fafb;
+        }
 
-    tbody tr {
-        transition: background 0.15s ease;
-    }
+        .empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 35px;
+        }
 
-    tbody tr:hover {
-        background: #f9fafb;
-    }
+        .alert-success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
 
-    .empty {
-        text-align: center;
-        color: #9ca3af;
-        padding: 35px;
-    }
+        .col-aksi {
+            width: 1%;
+            white-space: nowrap;
+            text-align: right;
+        }
 
-    .alert-success {
-        background: #dcfce7;
-        border: 1px solid #bbf7d0;
-        color: #166534;
-        border-radius: 8px;
-        padding: 12px 16px;
-        font-size: 13px;
-        margin-bottom: 18px;
-    }
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #2563eb;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
 
-    .col-aksi {
-        width: 1%;
-        white-space: nowrap;
-        text-align: right;
-    }
+        .btn-print:hover {
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
 
-    .btn-print {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #2563eb;
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 6px 12px;
-        border-radius: 8px;
-        text-decoration: none;
-        white-space: nowrap;
-        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
+        .aksi-grup {
+            display: inline-flex;
+            gap: 8px;
+        }
 
-    .btn-print:hover {
-        background: #dbeafe;
-        border-color: #93c5fd;
-    }
+        .btn-sppd {
+            color: #15803d;
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
 
-    .aksi-grup {
-        display: inline-flex;
-        gap: 8px;
-    }
-
-    .btn-sppd {
-        color: #15803d;
-        background: #f0fdf4;
-        border-color: #bbf7d0;
-    }
-
-    .btn-sppd:hover {
-        background: #dcfce7;
-        border-color: #86efac;
-    }
-
-</style>
-
+        .btn-sppd:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+    </style>
 @endpush

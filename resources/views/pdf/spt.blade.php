@@ -5,20 +5,63 @@
     <title>Surat Perintah Tugas</title>
     @include('pdf.partials.styles')
     <style>
-        @page { size: 215mm 330mm; margin: 5mm 8mm 5mm 8mm; }
-        body { font-family: "Times New Roman", Times, serif; font-size: 11pt; margin: 0; padding: 0; color: #000; }
+        @page {
+            size: 215mm 330mm;
+            margin: 5mm 8mm 5mm 8mm;
+        }
+
+        body {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 11pt;
+            margin: 0;
+            padding: 0;
+            color: #000;
+        }
 
         /* ==== KOP (samakan dengan SPPD) ==== */
-        .kop { padding-bottom: 4px; margin-bottom: 5mm; border-bottom: 2px double #000; }
-        .kop-pemda { font-size: 12pt; line-height: 1.0; }
-        .kop-dinas { font-size: 15pt; line-height: 1.1; margin-top: 1px; }
-        .kop-alamat { font-size: 8pt; margin-top: 2px; line-height: 1.2; }
-        .kop-logo img { width: 46px; }
+        .kop {
+            padding-bottom: 4px;
+            margin-bottom: 5mm;
+            border-bottom: 2px double #000;
+        }
+
+        .kop-pemda {
+            font-size: 12pt;
+            line-height: 1.0;
+        }
+
+        .kop-dinas {
+            font-size: 15pt;
+            line-height: 1.1;
+            margin-top: 1px;
+        }
+
+        .kop-alamat {
+            font-size: 8pt;
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+
+        .kop-logo img {
+            width: 46px;
+        }
 
         /* ==== JUDUL ==== */
-        .judul { text-align: center; margin: 10px 0 11px; }
-        .judul-utama { font-size: 14pt; font-weight: bold; letter-spacing: 1px; }
-        .nomor { font-size: 11pt; margin-top: 3px; }
+        .judul {
+            text-align: center;
+            margin: 10px 0 11px;
+        }
+
+        .judul-utama {
+            font-size: 14pt;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nomor {
+            font-size: 11pt;
+            margin-top: 3px;
+        }
 
         /* ==== MENUGASKAN ==== */
         .menugaskan {
@@ -30,38 +73,119 @@
         }
 
         /* ==== KEPADA ==== */
-        .kepada { width: 100%; border-collapse: collapse; margin-top: 3px; }
-        .kepada td { vertical-align: top; padding: 2px 0; font-size: 11pt; }
-        .label-kepada { width: 80px; font-weight: bold; }
-        .titik { width: 20px; }
+        .kepada {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 3px;
+        }
+
+        .kepada td {
+            vertical-align: top;
+            padding: 2px 0;
+            font-size: 11pt;
+        }
+
+        .label-kepada {
+            width: 80px;
+            font-weight: bold;
+        }
+
+        .titik {
+            width: 20px;
+        }
 
         /* ==== DATA PEGAWAI ==== */
-        .pegawai-wrapper { margin-top: 4px; margin-left: 105px; }
-        .pegawai { margin-bottom: 8px; }
-        .pegawai-table { width: 100%; border-collapse: collapse; }
-        .pegawai-table td { vertical-align: top; padding: 1px 0; font-size: 11pt; }
-        .pegawai-nomor { width: 25px; }
-        .pegawai-label { width: 70px; }
-        .pegawai-titik { width: 15px; }
-        .pegawai-nama { font-weight: bold; }
+        .pegawai-wrapper {
+            margin-top: 4px;
+            margin-left: 105px;
+        }
+
+        .pegawai {
+            margin-bottom: 8px;
+        }
+
+        .pegawai-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pegawai-table td {
+            vertical-align: top;
+            padding: 1px 0;
+            font-size: 11pt;
+        }
+
+        .pegawai-nomor {
+            width: 25px;
+        }
+
+        .pegawai-label {
+            width: 70px;
+        }
+
+        .pegawai-titik {
+            width: 15px;
+        }
+
+        .pegawai-nama {
+            font-weight: bold;
+        }
 
         /* ==== DASAR ==== */
+        .dasar-table td {
+            vertical-align: top;
+            padding: 2px 0;
+            font-size: 11pt;
+        }
 
-        .dasar-table td { vertical-align: top; padding: 2px 0; font-size: 11pt; }
-        .dasar-label { width: 80px; font-weight: bold; padding-left: 12px; }
-        .dasar-titik { width: 20px; padding-left: 4px; padding-right: 4px; }
-        .dasar-content { line-height: 1.5; white-space: pre-wrap; padding-right: 12px; }
+        .dasar-label {
+            width: 80px;
+            font-weight: bold;
+            padding-left: 12px;
+        }
+
+        .dasar-titik {
+            width: 20px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .dasar-content {
+            line-height: 1.5;
+            white-space: pre-wrap;
+            padding-right: 12px;
+        }
 
         /* ==== DETAIL TUGAS ==== */
-        .detail { width: 100%; border-collapse: collapse; margin-top: 8px; }
-        .detail td { vertical-align: top; padding: 2px 0; font-size: 11pt; }
-        .detail-label { width: 80px; font-weight: bold; }
-        .detail-titik { width: 20px; }
+        .detail {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .detail td {
+            vertical-align: top;
+            padding: 2px 0;
+            font-size: 11pt;
+        }
+
+        .detail-label {
+            width: 80px;
+            font-weight: bold;
+        }
+
+        .detail-titik {
+            width: 20px;
+        }
 
         /* ==== PENUTUP ==== */
-        .penutup { margin-top: 12px; line-height: 1.4; }
+        .penutup {
+            margin-top: 12px;
+            line-height: 1.4;
+        }
     </style>
 </head>
+
 <body>
     @include('pdf.partials.kop')
 
@@ -71,7 +195,7 @@
         <div class="nomor">Nomor : {{ $spt->nomor_spt }}</div>
     </div>
 
-    @if(!empty($spt->dasar))
+    @if (!empty($spt->dasar))
         <table class="dasar-table">
             <tr>
                 <td class="dasar-label">Dasar</td>
@@ -95,7 +219,7 @@
 
     {{-- Data pegawai --}}
     <div class="pegawai-wrapper">
-        @foreach($pegawais as $index => $pegawai)
+        @foreach ($pegawais as $index => $pegawai)
             <div class="pegawai">
                 <table class="pegawai-table">
                     <tr>
@@ -116,7 +240,7 @@
                         <td>:</td>
                         <td>
                             {{ $pegawai->pangkat ?: '-' }}
-                            @if($pegawai->golongan)
+                            @if ($pegawai->golongan)
                                 / {{ $pegawai->golongan }}
                             @endif
                         </td>
@@ -145,14 +269,15 @@
             <td>
                 @php
                     $tk = trim((string) ($spt->tempat_kegiatan ?? ''));
+
                     if ($spt->jenis_perjalanan === 'Dalam Daerah') {
                         $des = $spt->desa ? 'Desa ' . $spt->desa : '';
                         $kec = $spt->kecamatan?->nama ? 'Kec. ' . $spt->kecamatan->nama : '';
-                        $p = array_filter([$des, $kec], fn($v) => $v !== '');
+                        $p = array_filter([$des, $kec], fn ($v) => $v !== '');
                         echo $p ? implode(', ', $p) : '-';
                     } else {
                         $kota = $spt->kotaTujuan?->nama ?? '';
-                        $p = array_filter([$kota], fn($v) => $v !== '');
+                        $p = array_filter([$kota], fn ($v) => $v !== '');
                         echo $p ? implode(' - ', $p) : '-';
                     }
                 @endphp
