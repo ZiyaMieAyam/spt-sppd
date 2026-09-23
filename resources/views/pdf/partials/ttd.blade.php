@@ -1,7 +1,5 @@
 @php
     $tempatTtd = $tempatTtd ?? 'Paringin';
-    $jenisKop = $penandatangan['kop'] ?? 'diskominfo';
-    $pejabatSementara = Config::get('pejabat-sementara.' . str_replace('-', '_', $penandatangan['jabatan_key'] ?? ''), []);
 @endphp
 
 <div class="ttd-wrapper">

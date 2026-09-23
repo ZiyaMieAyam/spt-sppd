@@ -74,12 +74,7 @@ class PenandatanganService
             return $config[$kunci];
         }
 
-        $sementara = (array) Config::get(
-            'pejabat-sementara.'.str_replace('-', '_', $kunci),
-            []
-        );
-
-        return $sementara !== [] ? $sementara : null;
+        return null;
     }
 
     /**
