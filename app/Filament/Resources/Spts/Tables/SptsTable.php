@@ -72,7 +72,8 @@ class SptsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->label('Hapus yang dipilih'),
                 ]),
             ]);
     }

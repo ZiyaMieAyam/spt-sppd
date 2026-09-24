@@ -63,6 +63,50 @@
             margin-top: 3px;
         }
 
+        /* ==== TABEL UMUM: Dasar, Kepada, Untuk/Tempat/Tanggal ==== */
+        .dasar-table,
+        .kepada,
+        .detail {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dasar-table td,
+        .kepada td,
+        .detail td {
+            vertical-align: top;
+            padding: 2px 0;
+            font-size: 11pt;
+        }
+
+        /* Kolom label (Dasar, Kepada, Untuk, Tempat, Tanggal) */
+        .label {
+            width: 80px;
+            font-weight: bold;
+        }
+
+        /* Titik dua: Dasar, Kepada, Untuk, Tempat, Tanggal */
+        .titik {
+            width: 20px;
+        }
+
+        /* Titik dua khusus: Nama, NIP, Pangkat/Gol, Jabatan */
+        .titik-pegawai {
+            width: 15px;
+            padding-right: 6px;
+        }
+
+        /* ==== DASAR ==== */
+        /* line-height sama di semua kolom supaya label & titik dua sejajar baris pertama */
+        .dasar-table td {
+            line-height: 1.5;
+        }
+
+        .dasar-content {
+            white-space: pre-wrap;
+            padding-right: 12px;
+        }
+
         /* ==== MENUGASKAN ==== */
         .menugaskan {
             text-align: center;
@@ -74,24 +118,7 @@
 
         /* ==== KEPADA ==== */
         .kepada {
-            width: 100%;
-            border-collapse: collapse;
             margin-top: 3px;
-        }
-
-        .kepada td {
-            vertical-align: top;
-            padding: 2px 0;
-            font-size: 11pt;
-        }
-
-        .label-kepada {
-            width: 80px;
-            font-weight: bold;
-        }
-
-        .titik {
-            width: 20px;
         }
 
         /* ==== DATA PEGAWAI ==== */
@@ -120,62 +147,16 @@
         }
 
         .pegawai-label {
-            width: 70px;
-        }
-
-        .pegawai-titik {
-            width: 15px;
+            width: 85px;
         }
 
         .pegawai-nama {
             font-weight: bold;
         }
 
-        /* ==== DASAR ==== */
-        .dasar-table td {
-            vertical-align: top;
-            padding: 2px 0;
-            font-size: 11pt;
-        }
-
-        .dasar-label {
-            width: 80px;
-            font-weight: bold;
-            padding-left: 12px;
-        }
-
-        .dasar-titik {
-            width: 20px;
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-
-        .dasar-content {
-            line-height: 1.5;
-            white-space: pre-wrap;
-            padding-right: 12px;
-        }
-
         /* ==== DETAIL TUGAS ==== */
         .detail {
-            width: 100%;
-            border-collapse: collapse;
             margin-top: 8px;
-        }
-
-        .detail td {
-            vertical-align: top;
-            padding: 2px 0;
-            font-size: 11pt;
-        }
-
-        .detail-label {
-            width: 80px;
-            font-weight: bold;
-        }
-
-        .detail-titik {
-            width: 20px;
         }
 
         /* ==== PENUTUP ==== */
@@ -195,11 +176,12 @@
         <div class="nomor">Nomor : {{ $spt->nomor_spt }}</div>
     </div>
 
+    {{-- Dasar --}}
     @if (!empty($spt->dasar))
         <table class="dasar-table">
             <tr>
-                <td class="dasar-label">Dasar</td>
-                <td class="dasar-titik">:</td>
+                <td class="label">Dasar</td>
+                <td class="titik">:</td>
                 <td class="dasar-content">{!! nl2br(e($spt->dasar)) !!}</td>
             </tr>
         </table>
@@ -211,7 +193,7 @@
     {{-- Kepada --}}
     <table class="kepada">
         <tr>
-            <td class="label-kepada">Kepada</td>
+            <td class="label">Kepada</td>
             <td class="titik">:</td>
             <td></td>
         </tr>
@@ -225,19 +207,19 @@
                     <tr>
                         <td class="pegawai-nomor">{{ $index + 1 }}.</td>
                         <td class="pegawai-label">Nama</td>
-                        <td class="pegawai-titik">:</td>
+                        <td class="titik-pegawai">:</td>
                         <td class="pegawai-nama">{{ $pegawai->nama }}</td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td>NIP</td>
-                        <td>:</td>
+                        <td class="pegawai-label">NIP</td>
+                        <td class="titik-pegawai">:</td>
                         <td>{{ $pegawai->nip ?: '-' }}</td>
                     </tr>
                     <tr>
                         <td></td>
-                        <td>Pangkat/Gol</td>
-                        <td>:</td>
+                        <td class="pegawai-label">Pangkat/Gol</td>
+                        <td class="titik-pegawai">:</td>
                         <td>
                             {{ $pegawai->pangkat ?: '-' }}
                             @if ($pegawai->golongan)
@@ -247,8 +229,8 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td>Jabatan</td>
-                        <td>:</td>
+                        <td class="pegawai-label">Jabatan</td>
+                        <td class="titik-pegawai">:</td>
                         <td>{{ $pegawai->jabatan ?: '-' }}</td>
                     </tr>
                 </table>
@@ -259,17 +241,15 @@
     {{-- Detail tugas --}}
     <table class="detail">
         <tr>
-            <td class="detail-label">Untuk</td>
-            <td class="detail-titik">:</td>
+            <td class="label">Untuk</td>
+            <td class="titik">:</td>
             <td>{{ $spt->perihal }}</td>
         </tr>
         <tr>
-            <td class="detail-label">Tempat</td>
-            <td class="detail-titik">:</td>
+            <td class="label">Tempat</td>
+            <td class="titik">:</td>
             <td>
                 @php
-                    $tk = trim((string) ($spt->tempat_kegiatan ?? ''));
-
                     if ($spt->jenis_perjalanan === 'Dalam Daerah') {
                         $des = $spt->desa ? 'Desa ' . $spt->desa : '';
                         $kec = $spt->kecamatan?->nama ? 'Kec. ' . $spt->kecamatan->nama : '';
@@ -284,8 +264,8 @@
             </td>
         </tr>
         <tr>
-            <td class="detail-label">Tanggal</td>
-            <td class="detail-titik">:</td>
+            <td class="label">Tanggal</td>
+            <td class="titik">:</td>
             <td>{{ $spt->tanggal_berangkat?->translatedFormat('d F') }} s.d {{ $spt->tanggal_kembali?->translatedFormat('d F Y') }}</td>
         </tr>
     </table>

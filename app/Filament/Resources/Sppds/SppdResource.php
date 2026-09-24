@@ -21,6 +21,10 @@ class SppdResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPaperAirplane;
 
+    protected static ?string $modelLabel = 'Surat Perintah Perjalanan Dinas';
+
+    protected static ?string $pluralModelLabel = 'Surat Perintah Perjalanan Dinas';
+
     public static function form(Schema $schema): Schema
     {
         return SppdForm::configure($schema);
