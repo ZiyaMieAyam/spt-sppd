@@ -35,6 +35,7 @@ class FormController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validatedData($request);
+        $validated['pegawai_ids'] = array_values(array_unique(array_map('intval', $validated['pegawai_ids'])));
 
         DB::transaction(function () use ($validated) {
             $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
@@ -92,7 +93,7 @@ class FormController extends Controller
             'kecamatans' => Kecamatan::with('desas')->orderBy('nama')->get(),
             'kotaTujuans' => KotaTujuan::orderBy('nama')->get(),
             'selectedPegawaiIds' => $spt
-                ? $spt->sppds()->pluck('pegawai_id')->toArray()
+                ? array_values(array_unique($spt->sppds()->pluck('pegawai_id')->toArray()))
                 : [],
             'editMode' => true,
             'lastPerjalananDinas' => $lastPerjalananDinas,
@@ -103,6 +104,7 @@ class FormController extends Controller
     public function update(Request $request, Sppd $sppd)
     {
         $validated = $this->validatedData($request);
+        $validated['pegawai_ids'] = array_values(array_unique(array_map('intval', $validated['pegawai_ids'])));
 
         DB::transaction(function () use ($validated, $sppd) {
             $spt = $sppd->spt;
@@ -126,27 +128,47 @@ class FormController extends Controller
                 'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
             ]);
 
-            $spt->sppds()->delete();
+            $pegawaiIds = $validated['pegawai_ids'];
 
-            $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
-            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+            $existing = $spt->sppds()->get()->keyBy('pegawai_id');
 
-            foreach ($validated['pegawai_ids'] as $pegawaiId) {
-                $pegawai = Pegawai::findOrFail($pegawaiId);
+            // Hapus SPPD yang pegawainya tidak lagi ditugaskan.
+            $spt->sppds()->whereNotIn('pegawai_id', $pegawaiIds)->delete();
 
-                Sppd::create([
-                    'spt_id' => $spt->id,
-                    'pegawai_id' => $pegawai->id,
-                    'nomor_sppd' => Sppd::formatNomorSppd(
-                        $pegawai->kode_sppd,
-                        $urutan,
-                        $tanggalSpt
-                    ),
-                    'tanggal_berangkat' => $validated['tanggal_berangkat'],
-                    'tanggal_kembali' => $validated['tanggal_kembali'],
-                ]);
+            // Pertahankan nomor_sppd pegawai yang tetap; hanya sinkronkan tanggal.
+            foreach ($existing as $pegawaiId => $sppdRow) {
+                if (in_array($pegawaiId, $pegawaiIds, true)) {
+                    $sppdRow->update([
+                        'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                        'tanggal_kembali' => $validated['tanggal_kembali'],
+                    ]);
+                }
+            }
 
-                $urutan++;
+            // Buat SPPD hanya untuk pegawai baru agar nomor lama tidak berubah.
+            $baruIds = array_values(array_diff($pegawaiIds, $existing->keys()->all()));
+
+            if (! empty($baruIds)) {
+                $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
+                $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+
+                foreach ($baruIds as $pegawaiId) {
+                    $pegawai = Pegawai::findOrFail($pegawaiId);
+
+                    Sppd::create([
+                        'spt_id' => $spt->id,
+                        'pegawai_id' => $pegawai->id,
+                        'nomor_sppd' => Sppd::formatNomorSppd(
+                            $pegawai->kode_sppd,
+                            $urutan,
+                            $tanggalSpt
+                        ),
+                        'tanggal_berangkat' => $validated['tanggal_berangkat'],
+                        'tanggal_kembali' => $validated['tanggal_kembali'],
+                    ]);
+
+                    $urutan++;
+                }
             }
         });
 
@@ -184,7 +206,7 @@ class FormController extends Controller
             'perihal' => ['required', 'string'],
             'dasar' => ['nullable', 'string'],
             'pegawai_ids' => ['required', 'array', 'min:1'],
-            'pegawai_ids.*' => ['exists:pegawais,id'],
+            'pegawai_ids.*' => ['integer', 'exists:pegawais,id', 'distinct'],
             'kecamatan_id' => [
                 'nullable',
                 'exists:kecamatans,id',
@@ -219,6 +241,7 @@ class FormController extends Controller
         ], [
             'pegawai_ids.required' => 'Pilih minimal satu pegawai yang ditugaskan.',
             'pegawai_ids.min' => 'Pilih minimal satu pegawai yang ditugaskan.',
+            'pegawai_ids.*.distinct' => 'Pegawai tidak boleh dipilih lebih dari satu kali.',
             'kecamatan_id.required' => 'Kecamatan wajib dipilih untuk perjalanan dalam daerah.',
             'desa.required' => 'Desa wajib diisi untuk perjalanan dalam daerah.',
             'kota_tujuan_id.required' => 'Kota tujuan wajib dipilih untuk perjalanan luar daerah.',

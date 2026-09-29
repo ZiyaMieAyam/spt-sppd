@@ -18,7 +18,7 @@ class CreateSpt extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->pegawaiIds = $data['pegawais'] ?? [];
+        $this->pegawaiIds = array_values(array_unique(array_map('intval', $data['pegawais'] ?? [])));
 
         unset($data['pegawais']);
 

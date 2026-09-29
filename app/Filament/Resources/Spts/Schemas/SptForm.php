@@ -152,14 +152,20 @@ class SptForm
                     ->afterStateHydrated(function (Select $component, ?Spt $record) {
                         if ($record) {
                             $component->state(
-                                $record->pegawais()
-                                    ->pluck('pegawais.id')
-                                    ->toArray()
+                                array_values(array_unique(
+                                    $record->pegawais()
+                                        ->pluck('pegawais.id')
+                                        ->toArray()
+                                ))
                             );
                         }
                     })
                     ->dehydrated()
                     ->required()
+                    ->distinct()
+                    ->validationMessages([
+                        'distinct' => 'Pegawai tidak boleh dipilih lebih dari satu kali.',
+                    ])
                     ->columnSpanFull(),
             ]);
     }

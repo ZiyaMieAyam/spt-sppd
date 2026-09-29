@@ -18,7 +18,7 @@ class EditSpt extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->pegawaiIds = $data['pegawais'] ?? [];
+        $this->pegawaiIds = array_values(array_unique(array_map('intval', $data['pegawais'] ?? [])));
 
         unset($data['pegawais']);
 
@@ -28,31 +28,51 @@ class EditSpt extends EditRecord
     protected function afterSave(): void
     {
         DB::transaction(function () {
-            $this->record->sppds()->delete();
+            $pegawaiIds = $this->pegawaiIds;
 
-            $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
-            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+            $existing = $this->record->sppds()->get()->keyBy('pegawai_id');
 
-            foreach ($this->pegawaiIds as $pegawaiId) {
-                $pegawai = Pegawai::find($pegawaiId);
+            // Hapus SPPD yang pegawainya tidak lagi ditugaskan.
+            $this->record->sppds()->whereNotIn('pegawai_id', $pegawaiIds)->delete();
 
-                if (! $pegawai) {
-                    continue;
+            // Pertahankan nomor_sppd pegawai yang tetap; hanya sinkronkan tanggal.
+            foreach ($existing as $pegawaiId => $sppd) {
+                if (in_array($pegawaiId, $pegawaiIds, true)) {
+                    $sppd->update([
+                        'tanggal_berangkat' => $this->record->tanggal_berangkat,
+                        'tanggal_kembali' => $this->record->tanggal_kembali,
+                    ]);
                 }
+            }
 
-                Sppd::create([
-                    'spt_id' => $this->record->id,
-                    'pegawai_id' => $pegawai->id,
-                    'nomor_sppd' => Sppd::formatNomorSppd(
-                        $pegawai->kode_sppd,
-                        $urutan,
-                        $tanggalSpt
-                    ),
-                    'tanggal_berangkat' => $this->record->tanggal_berangkat,
-                    'tanggal_kembali' => $this->record->tanggal_kembali,
-                ]);
+            // Buat SPPD hanya untuk pegawai baru agar nomor lama tidak berubah.
+            $baruIds = array_values(array_diff($pegawaiIds, $existing->keys()->all()));
 
-                $urutan++;
+            if (! empty($baruIds)) {
+                $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
+                $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+
+                foreach ($baruIds as $pegawaiId) {
+                    $pegawai = Pegawai::find($pegawaiId);
+
+                    if (! $pegawai) {
+                        continue;
+                    }
+
+                    Sppd::create([
+                        'spt_id' => $this->record->id,
+                        'pegawai_id' => $pegawai->id,
+                        'nomor_sppd' => Sppd::formatNomorSppd(
+                            $pegawai->kode_sppd,
+                            $urutan,
+                            $tanggalSpt
+                        ),
+                        'tanggal_berangkat' => $this->record->tanggal_berangkat,
+                        'tanggal_kembali' => $this->record->tanggal_kembali,
+                    ]);
+
+                    $urutan++;
+                }
             }
         });
     }
