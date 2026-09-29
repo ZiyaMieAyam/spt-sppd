@@ -16,12 +16,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Akun admin development. Kredensial default hanya fallback lokal;
+        // set SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD di environment untuk
+        // menimpa tanpa mengubah kode (mis. staging/production).
         User::firstOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => env('SEED_ADMIN_EMAIL', 'admin@gmail.com')],
             [
                 'name' => 'Administrator',
                 'role' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make(env('SEED_ADMIN_PASSWORD', 'password')),
             ]
         );
 

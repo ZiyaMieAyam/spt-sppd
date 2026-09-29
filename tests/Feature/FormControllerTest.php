@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Desa;
+use App\Models\Kecamatan;
+use App\Models\KotaTujuan;
 use App\Models\Pegawai;
 use App\Models\Sppd;
 use App\Models\Spt;
@@ -13,16 +16,21 @@ class FormControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $admin;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed();
+
+        // User khusus test agar tidak bergantung pada kredensial/urutan seed.
+        $this->admin = User::factory()->create(['role' => 'admin']);
     }
 
     public function test_halaman_form_tampil(): void
     {
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('form'))
             ->assertOk()
             ->assertSee('Form SPT & SPPD')
@@ -33,15 +41,16 @@ class FormControllerTest extends TestCase
     public function test_create_dalam_daerah_menghasilkan_satu_spt_dan_banyak_sppd(): void
     {
         $pegawaiIds = Pegawai::orderBy('nama')->pluck('id')->take(3)->all();
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-12',
                 'tanggal_berangkat' => '2026-08-13',
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi kecamatan',
-                'kecamatan_id' => 1,
+                'kecamatan_id' => $kecamatanId,
                 'desa' => 'Batu Piring',
                 'pegawai_ids' => $pegawaiIds,
             ])
@@ -71,7 +80,7 @@ class FormControllerTest extends TestCase
 
     public function test_create_luar_daerah_tanpa_kota_tujuan_ditolak(): void
     {
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Luar Daerah',
                 'tanggal_spt' => '2026-08-12',
@@ -88,15 +97,17 @@ class FormControllerTest extends TestCase
 
     public function test_create_tanpa_pegawai_ditolak(): void
     {
-        $this->actingAs(User::firstOrFail())
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-12',
                 'tanggal_berangkat' => '2026-08-13',
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => 'Batu Piring',
                 'pegawai_ids' => [],
             ])
             ->assertSessionHasErrors('pegawai_ids');
@@ -109,7 +120,7 @@ class FormControllerTest extends TestCase
         $spt = $this->buatDataDasar();
         $sppd = $spt->sppds()->first();
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('form.edit', $sppd))
             ->assertOk()
             ->assertSee('Edit SPT & SPPD')
@@ -122,15 +133,16 @@ class FormControllerTest extends TestCase
         $sppd = $spt->sppds()->first();
         $nomorSpt = $spt->nomor_spt;
         $pegawaiIds = Pegawai::orderBy('nama')->pluck('id')->take(2)->all();
+        $kotaTujuanId = KotaTujuan::where('nama', 'Banjarmasin')->value('id');
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->put(route('form.update', $sppd), [
                 'jenis_perjalanan' => 'Luar Daerah',
                 'tanggal_spt' => '2026-08-12',
                 'tanggal_berangkat' => '2026-08-16',
                 'tanggal_kembali' => '2026-08-18',
                 'perihal' => 'Bimtek Banjarmasin',
-                'kota_tujuan_id' => 1,
+                'kota_tujuan_id' => $kotaTujuanId,
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect(route('luar-daerah'));
@@ -141,7 +153,7 @@ class FormControllerTest extends TestCase
         $this->assertSame('Luar Daerah', $spt->jenis_perjalanan);
         $this->assertNull($spt->kecamatan_id);
         $this->assertNull($spt->desa);
-        $this->assertSame(1, $spt->kota_tujuan_id);
+        $this->assertSame($kotaTujuanId, $spt->kota_tujuan_id);
         $this->assertSame(2, $spt->sppds()->count());
     }
 
@@ -151,7 +163,7 @@ class FormControllerTest extends TestCase
         $sppd = $spt->sppds()->first();
         $sptId = $spt->id;
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->delete(route('form.delete', $sppd))
             ->assertRedirect();
 
@@ -163,18 +175,21 @@ class FormControllerTest extends TestCase
     {
         $this->buatDataDasar();
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('dalam-daerah'))
             ->assertOk()
             ->assertSee('Awayan');
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('luar-daerah'))
             ->assertOk();
     }
 
     protected function buatDataDasar(): Spt
     {
+        $kecamatanId = Kecamatan::where('nama', 'Awayan')->value('id');
+        $desa = Desa::where('kecamatan_id', $kecamatanId)->orderBy('nama')->value('nama');
+
         $spt = Spt::create([
             'jenis_perjalanan' => 'Dalam Daerah',
             'nomor_spt' => Spt::generateNomorSpt('2026-08-12'),
@@ -182,8 +197,8 @@ class FormControllerTest extends TestCase
             'tanggal_berangkat' => '2026-08-13',
             'tanggal_kembali' => '2026-08-15',
             'perihal' => 'Rapat koordinasi',
-            'kecamatan_id' => 1,
-            'desa' => 'Batu Piring',
+            'kecamatan_id' => $kecamatanId,
+            'desa' => $desa,
             'kota_tujuan_id' => null,
         ]);
 

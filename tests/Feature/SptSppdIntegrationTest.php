@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Desa;
 use App\Models\Kecamatan;
 use App\Models\KotaTujuan;
 use App\Models\Pegawai;
@@ -16,11 +17,36 @@ class SptSppdIntegrationTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $admin;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed();
+
+        // User khusus test agar tidak bergantung pada kredensial/urutan seed.
+        $this->admin = User::factory()->create(['role' => 'admin']);
+    }
+
+    protected function kecamatanDesa(string $namaDesa): array
+    {
+        $kecamatanId = Desa::where('nama', $namaDesa)->value('kecamatan_id');
+
+        return [$kecamatanId, $namaDesa];
+    }
+
+    protected function desaKecamatan(string $namaKecamatan): array
+    {
+        $kecamatanId = Kecamatan::where('nama', $namaKecamatan)->value('id');
+        $desa = Desa::where('kecamatan_id', $kecamatanId)->orderBy('nama')->value('nama');
+
+        return [$kecamatanId, $desa];
+    }
+
+    protected function kotaTujuan(string $nama = 'Banjarmasin'): int
+    {
+        return KotaTujuan::where('nama', $nama)->value('id');
     }
 
     // ── Case 1 ───────────────────────────────────────────────
@@ -30,16 +56,17 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_1_user_creates_1_spt_with_3_pegawai(): void
     {
         $pegawaiIds = Pegawai::orderBy('nama')->pluck('id')->take(3)->all();
+        [$kecamatanId, $desa] = $this->kecamatanDesa('Batu Piring');
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Rapat integrasi data',
-                'kecamatan_id' => 1,
-                'desa' => 'Batu Piring',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect(route('dalam-daerah'));
@@ -85,17 +112,18 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_2_3_admin_and_user_share_same_database(): void
     {
         $pegawaiIds = Pegawai::orderBy('nama')->pluck('id')->take(2)->all();
+        [$kecamatanId, $desa] = $this->kecamatanDesa('Batu Piring');
 
         // 1) User membuat SPT via FormController
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'User membuat ini',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa A',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect();
@@ -119,7 +147,7 @@ class SptSppdIntegrationTest extends TestCase
             'tanggal_berangkat' => '2026-08-25',
             'tanggal_kembali' => '2026-08-27',
             'perihal' => 'Admin membuat ini',
-            'kota_tujuan_id' => 1,
+            'kota_tujuan_id' => $this->kotaTujuan(),
         ]);
 
         Sppd::create([
@@ -146,17 +174,18 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_4_ordering_spt_is_ascending(): void
     {
         $pegawais = Pegawai::orderBy('nama')->take(1)->get();
+        [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
 
         for ($i = 1; $i <= 4; $i++) {
-            $this->actingAs(User::firstOrFail())
+            $this->actingAs($this->admin)
                 ->post(route('form.simpan'), [
                     'jenis_perjalanan' => 'Dalam Daerah',
                     'tanggal_spt' => '2026-08-19',
                     'tanggal_berangkat' => '2026-08-20',
                     'tanggal_kembali' => '2026-08-22',
                     'perihal' => "Perjalanan ke-$i",
-                    'kecamatan_id' => 1,
-                    'desa' => 'Desa',
+                    'kecamatan_id' => $kecamatanId,
+                    'desa' => $desa,
                     'pegawai_ids' => $pegawais->pluck('id')->toArray(),
                 ])
                 ->assertRedirect();
@@ -182,9 +211,11 @@ class SptSppdIntegrationTest extends TestCase
             );
         }
 
-        // Verifikasi: id juga berurutan (ascending = nomor ascending)
+        // Verifikasi: id juga berurutan (ascending = nomor ascending).
+        // ID absolut tidak diasumsikan karena auto-increment MySQL tidak
+        // di-reset oleh rollback antar test; yang penting 4 id berurutan.
         $ids = $spts->pluck('id')->toArray();
-        $this->assertSame([1, 2, 3, 4], $ids);
+        $this->assertSame($ids, range($ids[0], $ids[0] + 3));
     }
 
     // ── Case 4 tambahan: SPPD ordering ──────────────────────
@@ -192,30 +223,32 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_4_ordering_sppd_is_ascending_grouped_by_spt(): void
     {
         $pegawais = Pegawai::orderBy('nama')->take(2)->pluck('id')->toArray();
+        [$kecamatanId1, $desa1] = $this->desaKecamatan('Awayan');
+        [$kecamatanId2, $desa2] = $this->desaKecamatan('Halong');
 
         // SPT 1: 2 pegawai
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'SPT pertama',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId1,
+                'desa' => $desa1,
                 'pegawai_ids' => $pegawais,
             ]);
 
         // SPT 2: 2 pegawai
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'SPT kedua',
-                'kecamatan_id' => 2,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId2,
+                'desa' => $desa2,
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -226,11 +259,12 @@ class SptSppdIntegrationTest extends TestCase
 
         $this->assertCount(4, $sppds);
 
-        // SPPD pertama 2 item spt_id=1, lalu 2 item spt_id=2
-        $this->assertSame(1, $sppds[0]->spt_id);
-        $this->assertSame(1, $sppds[1]->spt_id);
-        $this->assertSame(2, $sppds[2]->spt_id);
-        $this->assertSame(2, $sppds[3]->spt_id);
+        // Dua SPPD pertama satu SPT, dua berikutnya SPT lain yang lebih baru.
+        // ID absolut tidak diasumsikan karena auto-increment MySQL tidak
+        // di-reset oleh rollback antar test.
+        $this->assertSame($sppds[0]->spt_id, $sppds[1]->spt_id);
+        $this->assertSame($sppds[2]->spt_id, $sppds[3]->spt_id);
+        $this->assertGreaterThan($sppds[1]->spt_id, $sppds[2]->spt_id);
 
         // Dalam satu spt_id, id harus ascending
         $this->assertLessThan($sppds[1]->id, $sppds[0]->id);
@@ -241,15 +275,17 @@ class SptSppdIntegrationTest extends TestCase
 
     public function test_case_5_dalam_daerah_fields(): void
     {
-        $this->actingAs(User::firstOrFail())
+        [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
+
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Dalam daerah test',
-                'kecamatan_id' => 1,
-                'desa' => 'Batu Piring',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => [Pegawai::first()->id],
             ]);
 
@@ -259,7 +295,7 @@ class SptSppdIntegrationTest extends TestCase
         $this->assertNotNull($spt->kecamatan_id, 'kecamatan_id should be set for Dalam Daerah');
         $this->assertNotNull($spt->desa, 'desa should be set for Dalam Daerah');
         $this->assertNull($spt->kota_tujuan_id, 'kota_tujuan_id should be null for Dalam Daerah');
-        $this->assertSame(1, $spt->kecamatan_id);
+        $this->assertSame($kecamatanId, $spt->kecamatan_id);
 
         $kecamatan = Kecamatan::find($spt->kecamatan_id);
         $this->assertSame('Awayan', $kecamatan->nama);
@@ -270,14 +306,16 @@ class SptSppdIntegrationTest extends TestCase
 
     public function test_case_6_luar_daerah_fields(): void
     {
-        $this->actingAs(User::firstOrFail())
+        $kotaTujuanId = $this->kotaTujuan('Banjarmasin');
+
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Luar Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Luar daerah test',
-                'kota_tujuan_id' => 1,
+                'kota_tujuan_id' => $kotaTujuanId,
                 'pegawai_ids' => [Pegawai::first()->id],
             ]);
 
@@ -287,7 +325,7 @@ class SptSppdIntegrationTest extends TestCase
         $this->assertNotNull($spt->kota_tujuan_id, 'kota_tujuan_id should be set for Luar Daerah');
         $this->assertNull($spt->kecamatan_id, 'kecamatan_id should be null for Luar Daerah');
         $this->assertNull($spt->desa, 'desa should be null for Luar Daerah');
-        $this->assertSame(1, $spt->kota_tujuan_id);
+        $this->assertSame($kotaTujuanId, $spt->kota_tujuan_id);
 
         $kota = KotaTujuan::find($spt->kota_tujuan_id);
         $this->assertSame('Banjarmasin', $kota->nama);
@@ -299,17 +337,19 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_7_user_edit_affects_same_data(): void
     {
         $pegawais = Pegawai::orderBy('nama')->pluck('id')->take(2)->toArray();
+        [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
+        $kotaTujuanId = KotaTujuan::orderBy('id')->skip(1)->value('id');
 
         // Buat SPT via User
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Sebelum edit',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -317,14 +357,14 @@ class SptSppdIntegrationTest extends TestCase
         $sppd = $spt->sppds()->first();
 
         // Edit via User (FormController)
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->put(route('form.update', $sppd), [
                 'jenis_perjalanan' => 'Luar Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-25',
                 'tanggal_kembali' => '2026-08-27',
                 'perihal' => 'Sesudah edit',
-                'kota_tujuan_id' => 2,
+                'kota_tujuan_id' => $kotaTujuanId,
                 'pegawai_ids' => $pegawais,
             ])
             ->assertRedirect(route('luar-daerah'));
@@ -334,7 +374,7 @@ class SptSppdIntegrationTest extends TestCase
         $this->assertSame('Sesudah edit', $spt->perihal);
         $this->assertSame('Luar Daerah', $spt->jenis_perjalanan);
         $this->assertNull($spt->kecamatan_id);
-        $this->assertSame(2, $spt->kota_tujuan_id);
+        $this->assertSame($kotaTujuanId, $spt->kota_tujuan_id);
 
         // 2 SPPD tetap ada (dihapus dan dibuat ulang)
         $this->assertSame(2, $spt->sppds()->count());
@@ -343,7 +383,7 @@ class SptSppdIntegrationTest extends TestCase
         $sppdFirst = $spt->sppds()->first();
         $sptId = $spt->id;
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->delete(route('form.delete', $sppdFirst))
             ->assertRedirect();
 
@@ -357,6 +397,7 @@ class SptSppdIntegrationTest extends TestCase
     public function test_case_8_admin_edit_affects_same_data(): void
     {
         $pegawai = Pegawai::orderBy('nama')->first();
+        $kecamatanId = Kecamatan::where('nama', 'Awayan')->value('id');
 
         // Admin membuat SPT langsung via model
         $spt = Spt::create([
@@ -366,7 +407,7 @@ class SptSppdIntegrationTest extends TestCase
             'tanggal_berangkat' => '2026-08-20',
             'tanggal_kembali' => '2026-08-22',
             'perihal' => 'Admin membuat ini',
-            'kecamatan_id' => 1,
+            'kecamatan_id' => $kecamatanId,
             'desa' => 'Desa Admin',
         ]);
 
@@ -381,7 +422,7 @@ class SptSppdIntegrationTest extends TestCase
         $sptId = $spt->id;
 
         // User melihat data yang sama — cek via dalam-daerah
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('dalam-daerah'))
             ->assertOk()
             ->assertSee('Desa Admin');
@@ -400,7 +441,7 @@ class SptSppdIntegrationTest extends TestCase
         $this->assertSame('Desa Baru', $spt->desa);
 
         // User melihat perubahan yang sama
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('dalam-daerah'))
             ->assertOk()
             ->assertSee('Desa Baru');
@@ -410,7 +451,7 @@ class SptSppdIntegrationTest extends TestCase
         Spt::where('id', $sptId)->delete();
 
         // User tidak melihat data lagi
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->get(route('dalam-daerah'))
             ->assertOk()
             ->assertDontSee('Desa Baru');
@@ -424,16 +465,17 @@ class SptSppdIntegrationTest extends TestCase
     public function test_sppd_from_formcontroller_has_tanggal(): void
     {
         $pegawais = Pegawai::orderBy('nama')->pluck('id')->take(2)->toArray();
+        [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
 
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Tanggal test',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -450,17 +492,18 @@ class SptSppdIntegrationTest extends TestCase
     public function test_generate_nomor_spt_uses_tanggal_from_form(): void
     {
         $pegawais = Pegawai::orderBy('nama')->pluck('id')->take(1)->toArray();
+        [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
 
         // SPT pertama
-        $this->actingAs(User::firstOrFail())
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Nomor test',
-                'kecamatan_id' => 1,
-                'desa' => 'Desa',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -475,15 +518,17 @@ class SptSppdIntegrationTest extends TestCase
 
     public function test_spt_dalam_daerah_has_kecamatan_and_desa(): void
     {
-        $this->actingAs(User::firstOrFail())
+        [$kecamatanId, $desa] = $this->desaKecamatan('Halong');
+
+        $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
                 'tanggal_spt' => '2026-08-19',
                 'tanggal_berangkat' => '2026-08-20',
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Test relasi',
-                'kecamatan_id' => 3,
-                'desa' => 'Gunung Rintis',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $desa,
                 'pegawai_ids' => [Pegawai::first()->id],
             ]);
 
@@ -491,7 +536,7 @@ class SptSppdIntegrationTest extends TestCase
 
         $this->assertNotNull($spt->kecamatan);
         $this->assertSame('Halong', $spt->kecamatan->nama);
-        $this->assertSame('Gunung Rintis', $spt->desa);
+        $this->assertSame($desa, $spt->desa);
         $this->assertNull($spt->kotaTujuan);
     }
 }
