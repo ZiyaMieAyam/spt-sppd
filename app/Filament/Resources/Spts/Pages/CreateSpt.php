@@ -3,9 +3,8 @@
 namespace App\Filament\Resources\Spts\Pages;
 
 use App\Filament\Resources\Spts\SptResource;
-use App\Models\Pegawai;
-use App\Models\Sppd;
 use App\Models\Spt;
+use App\Services\SppdSyncService;
 use Carbon\Carbon;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
@@ -31,30 +30,14 @@ class CreateSpt extends CreateRecord
     protected function afterCreate(): void
     {
         DB::transaction(function () {
-            $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
-            $urutan = Sppd::reserveNomorBlok(count($this->pegawaiIds), $tanggalSpt);
-
-            foreach ($this->pegawaiIds as $pegawaiId) {
-                $pegawai = Pegawai::find($pegawaiId);
-
-                if (! $pegawai) {
-                    continue;
-                }
-
-                Sppd::create([
-                    'spt_id' => $this->record->id,
-                    'pegawai_id' => $pegawai->id,
-                    'nomor_sppd' => Sppd::formatNomorSppd(
-                        $pegawai->kode_sppd,
-                        $urutan,
-                        $tanggalSpt
-                    ),
-                    'tanggal_berangkat' => $this->record->tanggal_berangkat,
-                    'tanggal_kembali' => $this->record->tanggal_kembali,
-                ]);
-
-                $urutan++;
-            }
+            SppdSyncService::createForSpt(
+                $this->record,
+                $this->pegawaiIds,
+                $this->record->tanggal_spt,
+                $this->record->tanggal_berangkat,
+                $this->record->tanggal_kembali,
+                strict: false
+            );
         });
     }
 }

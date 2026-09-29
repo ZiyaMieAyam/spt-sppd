@@ -177,6 +177,7 @@ class SptSppdIntegrationTest extends TestCase
         [$kecamatanId, $desa] = $this->desaKecamatan('Awayan');
 
         for ($i = 1; $i <= 4; $i++) {
+            // Rentang sengaja sama: overlap BOLEH, tidak ada penolakan.
             $this->actingAs($this->admin)
                 ->post(route('form.simpan'), [
                     'jenis_perjalanan' => 'Dalam Daerah',
@@ -239,7 +240,7 @@ class SptSppdIntegrationTest extends TestCase
                 'pegawai_ids' => $pegawais,
             ]);
 
-        // SPT 2: 2 pegawai
+        // SPT 2: 2 pegawai, rentang sama (overlap BOLEH).
         $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Dalam Daerah',
