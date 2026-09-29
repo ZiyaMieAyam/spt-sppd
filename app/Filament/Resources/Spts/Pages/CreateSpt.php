@@ -32,7 +32,7 @@ class CreateSpt extends CreateRecord
     {
         DB::transaction(function () {
             $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
-            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+            $urutan = Sppd::reserveNomorBlok(count($this->pegawaiIds), $tanggalSpt);
 
             foreach ($this->pegawaiIds as $pegawaiId) {
                 $pegawai = Pegawai::find($pegawaiId);

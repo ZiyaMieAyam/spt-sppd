@@ -41,18 +41,21 @@ class Sppd extends Model
     {
         $tanggal = Carbon::parse($tanggal ?? now());
 
-        $max = self::get('nomor_sppd')
-            ->filter(function (self $item) use ($tanggal) {
-                return str_ends_with($item->nomor_sppd, '/'.$tanggal->year);
-            })
-            ->map(function (self $item) {
-                preg_match('/\/(\d+)\/DISKOMINFOSAN-BLG\//', $item->nomor_sppd, $match);
+        // Counter 'sppd' per tahun, terpisah dari counter 'spt'.
+        return NomorUrut::reserveNext(NomorUrut::JENIS_SPPD, $tanggal->year);
+    }
 
-                return isset($match[1]) ? (int) $match[1] : 0;
-            })
-            ->max() ?? 0;
+    /**
+     * Reservasi satu blok nomor SPPD sekaligus (satu SPT bisa untuk
+     * beberapa pegawai). Mengembalikan nomor pertama; pemanggil
+     * menaikkan +1 untuk tiap pegawai berikutnya tanpa query tambahan,
+     * sehingga tidak ada celah race antar nomor dalam satu SPT.
+     */
+    public static function reserveNomorBlok(int $jumlah, Carbon|string|null $tanggal = null): int
+    {
+        $tanggal = Carbon::parse($tanggal ?? now());
 
-        return $max + 1;
+        return NomorUrut::reserveNext(NomorUrut::JENIS_SPPD, $tanggal->year, $jumlah);
     }
 
     public static function formatNomorSppd(

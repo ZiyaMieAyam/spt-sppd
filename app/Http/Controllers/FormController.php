@@ -54,7 +54,7 @@ class FormController extends Controller
                 'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
             ]);
 
-            $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+            $urutan = Sppd::reserveNomorBlok(count($validated['pegawai_ids']), $tanggalSpt);
 
             foreach ($validated['pegawai_ids'] as $pegawaiId) {
                 $pegawai = Pegawai::findOrFail($pegawaiId);
@@ -150,7 +150,7 @@ class FormController extends Controller
 
             if (! empty($baruIds)) {
                 $tanggalSpt = Carbon::parse($validated['tanggal_spt']);
-                $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+                $urutan = Sppd::reserveNomorBlok(count($baruIds), $tanggalSpt);
 
                 foreach ($baruIds as $pegawaiId) {
                     $pegawai = Pegawai::findOrFail($pegawaiId);

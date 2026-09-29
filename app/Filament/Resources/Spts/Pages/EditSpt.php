@@ -50,7 +50,7 @@ class EditSpt extends EditRecord
 
             if (! empty($baruIds)) {
                 $tanggalSpt = Carbon::parse($this->record->tanggal_spt);
-                $urutan = Sppd::nomorBerikutnya($tanggalSpt);
+                $urutan = Sppd::reserveNomorBlok(count($baruIds), $tanggalSpt);
 
                 foreach ($baruIds as $pegawaiId) {
                     $pegawai = Pegawai::find($pegawaiId);

@@ -56,20 +56,14 @@ class Spt extends Model
     {
         $tanggal = Carbon::parse($tanggal ?? now());
 
-        $nomor = self::get('nomor_spt')
-            ->filter(function (self $item) use ($tanggal) {
-                return str_ends_with($item->nomor_spt, '/'.$tanggal->year);
-            })
-            ->map(function (self $item) {
-                preg_match('/^090\/(\d+)\//', $item->nomor_spt, $match);
-
-                return isset($match[1]) ? (int) $match[1] : 0;
-            })
-            ->max() ?? 0;
+        // Reservasi via tabel nomor_uruts (counter 'spt' per tahun) dengan
+        // lockForUpdate di transaksi sendiri, sehingga aman dari nomor
+        // kembar saat dua request bersamaan. Format tidak berubah.
+        $nomor = NomorUrut::reserveNext(NomorUrut::JENIS_SPT, $tanggal->year);
 
         return sprintf(
             '090/%03d/SPT/DISKOMINFOSAN-BLG/%s/%d',
-            $nomor + 1,
+            $nomor,
             self::bulanRomawi($tanggal->month),
             $tanggal->year
         );
