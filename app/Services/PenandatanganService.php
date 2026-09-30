@@ -4,11 +4,33 @@ namespace App\Services;
 
 use App\Models\Pegawai;
 use App\Models\Penandatangan;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class PenandatanganService
 {
+    /**
+     * Memo hasil barisDatabase() selama request ini saja.
+     *
+     * PHP-FPM: memori request terpisah, tidak ada risiko stale
+     * lintas-request. Dipakai agar cari()/semua()/yangDiizinkan()/
+     * valid() tidak mengulang query yang sama. Direset via
+     * flushMemo() (dipakai test).
+     *
+     * @var array<string, array>|null
+     */
+    private static ?array $memoBaris = null;
+
+    /**
+     * Reset memo request. Dipakai test agar tidak bocor antar test
+     * (PHPUnit berjalan dalam satu proses).
+     */
+    public static function flushMemo(): void
+    {
+        self::$memoBaris = null;
+    }
     /**
      * Semua penandatangan yang terdaftar: kunci => definisi.
      *
@@ -56,13 +78,15 @@ class PenandatanganService
             return null;
         }
 
-        $semua = self::semua();
-
-        if (isset($semua[$kunci])) {
-            return $semua[$kunci];
-        }
-
+        // Satu kali fetch: turunan pilihan SPT (berkop) + baris khusus
+        // (mis. kepala_dinas, pejabat_teknis) berasal dari hasil yang sama.
         $db = self::barisDatabase();
+
+        foreach ($db as $k => $definisi) {
+            if ($k === $kunci && filled($definisi['kop'] ?? null)) {
+                return $definisi;
+            }
+        }
 
         if (isset($db[$kunci])) {
             return $db[$kunci];
@@ -82,18 +106,28 @@ class PenandatanganService
      * dikunci berdasarkan kolom `kunci`. Mengembalikan array kosong
      * bila tabel belum ada atau belum berisi data.
      *
+     * Hasil di-memo selama request agar tidak query berulang.
+     *
      * @return array<string, array>
      */
     private static function barisDatabase(): array
     {
+        if (self::$memoBaris !== null) {
+            return self::$memoBaris;
+        }
+
         try {
             $rows = Penandatangan::query()->orderBy('id')->get();
-        } catch (\Throwable) {
-            return [];
+        } catch (QueryException $e) {
+            Log::warning('PenandatanganService: gagal membaca tabel penandatangans, memakai config fallback.', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return self::$memoBaris = [];
         }
 
         if ($rows->isEmpty()) {
-            return [];
+            return self::$memoBaris = [];
         }
 
         $hasil = [];
@@ -109,7 +143,7 @@ class PenandatanganService
             ];
         }
 
-        return $hasil;
+        return self::$memoBaris = $hasil;
     }
 
     /**
