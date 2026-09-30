@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Spts\Pages;
 
 use App\Filament\Resources\Spts\SptResource;
+use App\Models\Desa;
 use App\Models\Spt;
 use App\Services\SppdSyncService;
 use Carbon\Carbon;
@@ -23,6 +24,11 @@ class CreateSpt extends CreateRecord
 
         $tanggalSpt = Carbon::parse($data['tanggal_spt']);
         $data['nomor_spt'] = Spt::generateNomorSpt($tanggalSpt);
+
+        // Snapshot nama desa dari master terpilih (kolom string tetap sumber PDF).
+        $data['desa'] = ! empty($data['desa_id'])
+            ? Desa::whereKey($data['desa_id'])->value('nama')
+            : null;
 
         return $data;
     }

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Spts\Pages;
 
 use App\Filament\Resources\Spts\SptResource;
+use App\Models\Desa;
 use App\Services\SppdSyncService;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -19,6 +20,11 @@ class EditSpt extends EditRecord
         $this->pegawaiIds = array_values(array_unique(array_map('intval', $data['pegawais'] ?? [])));
 
         unset($data['pegawais']);
+
+        // Snapshot nama desa dari master terpilih (kolom string tetap sumber PDF).
+        $data['desa'] = ! empty($data['desa_id'])
+            ? Desa::whereKey($data['desa_id'])->value('nama')
+            : null;
 
         return $data;
     }

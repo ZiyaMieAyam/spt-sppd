@@ -275,8 +275,8 @@
                             </label>
 
                             <select
-                                name="desa"
-                                id="desa"
+                                name="desa_id"
+                                id="desa_id"
                                 class="searchable"
                             >
                                 <option value="">
@@ -284,7 +284,7 @@
                                 </option>
                             </select>
 
-                            @error('desa')
+                            @error('desa_id')
                                 <span class="field-error">{{ $message }}</span>
                             @enderror
 
@@ -728,16 +728,16 @@
 
             const desaByKecamatan = @json(
                 $kecamatans->mapWithKeys(function ($k) {
-                    return [$k->id => $k->desas->pluck('nama')->sort()->values()->toArray()];
+                    return [$k->id => $k->desas->map(fn ($d) => ['id' => $d->id, 'nama' => $d->nama])->sortBy('nama')->values()->toArray()];
                 })->toArray()
             );
 
-            const desaSelected = @json(old('desa', $spt->desa ?? ''));
+            const desaSelected = @json(old('desa_id', $selectedDesaId ?? ''));
 
             const kecamatanEl = document.getElementById('kecamatan_id');
-            const desaEl = document.getElementById('desa');
+            const desaEl = document.getElementById('desa_id');
 
-            const tomDesa = new TomSelect('#desa', {
+            const tomDesa = new TomSelect('#desa_id', {
                 create: false,
                 placeholder: 'Pilih desa/kelurahan',
                 searchField: ['text'],
@@ -753,19 +753,20 @@
 
                 tomDesa.addOption({value: '', text: 'Pilih desa/kelurahan'});
 
-                list.forEach(function (nama) {
-                    tomDesa.addOption({value: nama, text: nama});
+                list.forEach(function (item) {
+                    tomDesa.addOption({value: String(item.id), text: item.nama});
                 });
 
                 tomDesa.refreshOptions(false);
 
-                // Tentukan nilai yang harus dipilih
+                // Tentukan nilai yang harus dipilih (bandingkan sebagai string ID)
+                const ids = list.map((item) => String(item.id));
                 let targetValue = '';
-                if (keepSelected && currentValue && list.includes(currentValue)) {
-                    targetValue = currentValue;
-                } else if (!keepSelected && desaSelected && list.includes(desaSelected)) {
+                if (keepSelected && currentValue && ids.includes(String(currentValue))) {
+                    targetValue = String(currentValue);
+                } else if (!keepSelected && desaSelected && ids.includes(String(desaSelected))) {
                     // Initial load: gunakan old/spt value jika cocok dengan kecamatan
-                    targetValue = desaSelected;
+                    targetValue = String(desaSelected);
                 }
 
                 if (targetValue) {

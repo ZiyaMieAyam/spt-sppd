@@ -68,17 +68,25 @@ class Spt extends Model
 
     protected static function booted(): void
     {
-        // Tahap 1: isi desa_id otomatis HANYA bila cocok persis
-        // (nama + kecamatan_id). Tidak menimpa desa_id yang sudah ada
-        // kecuali desa/kecamatan berubah; tidak mengubah string `desa`.
+        // Tahap 1-3: jaga konsistensi pasangan desa_id + snapshot `desa`.
+        // - String/kecamatan berubah (atau record baru): turunkan desa_id
+        //   dari string via exact match (tidak mengubah string).
+        // - String tidak berubah: jangan timpa desa_id eksplisit; hanya
+        //   isi bila masih kosong (baris legacy yang disimpan ulang).
         static::saving(function (Spt $spt): void {
-            if (! $spt->isDirty('desa') && ! $spt->isDirty('kecamatan_id') && ! empty($spt->getAttributeFromArray('desa_id'))) {
+            if (! $spt->isDirty('desa') && ! $spt->isDirty('kecamatan_id')) {
+                if (empty($spt->getAttributeFromArray('desa_id')) && $spt->desa && $spt->kecamatan_id) {
+                    $spt->desa_id = self::resolveDesaId($spt->desa, (int) $spt->kecamatan_id);
+                }
+
                 return;
             }
 
-            $spt->desa_id = $spt->desa && $spt->kecamatan_id
-                ? self::resolveDesaId($spt->desa, (int) $spt->kecamatan_id)
-                : null;
+            if ($spt->desa && $spt->kecamatan_id) {
+                $spt->desa_id = self::resolveDesaId($spt->desa, (int) $spt->kecamatan_id);
+            } elseif (! $spt->isDirty('desa_id')) {
+                $spt->desa_id = null;
+            }
         });
     }
 

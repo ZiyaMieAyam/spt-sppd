@@ -11,6 +11,7 @@ use App\Models\Spt;
 use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class FormControllerTest extends TestCase
@@ -52,7 +53,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi kecamatan',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect(route('dalam-daerah'));
@@ -111,7 +112,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi kecamatan',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => [$pegawaiId, $pegawaiId],
             ])
             ->assertSessionHasErrors('pegawai_ids.1');
@@ -137,7 +138,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $spt->desa,
+                'desa_id' => $spt->desa_id,
                 'pegawai_ids' => [$pegawaiId, $pegawaiId],
             ])
             ->assertSessionHasErrors('pegawai_ids.1');
@@ -175,7 +176,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => [$pegawaiId],
             ])
             ->assertRedirect(route('dalam-daerah'));
@@ -196,7 +197,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => [$pegawaiId],
             ])
             ->assertRedirect(route('dalam-daerah'));
@@ -217,7 +218,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat koordinasi',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => [$pegawaiId],
             ])
             ->assertSessionHasErrors('tanggal_spt');
@@ -276,6 +277,138 @@ class FormControllerTest extends TestCase
         $this->assertSame(0, Sppd::count());
     }
 
+    public function test_create_desa_valid_menyimpan_id_dan_snapshot(): void
+    {
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+        $desaId = Desa::where('nama', 'Batu Piring')->value('id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa_id' => $desaId,
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertRedirect(route('dalam-daerah'));
+
+        $spt = Spt::first();
+
+        $this->assertSame($desaId, $spt->desa_id);
+        $this->assertSame('Batu Piring', $spt->desa);
+    }
+
+    public function test_create_desa_kecamatan_lain_ditolak(): void
+    {
+        $awayan = Kecamatan::where('nama', 'Awayan')->value('id');
+        $desaId = Desa::where('nama', 'Batu Piring')->value('id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $awayan,
+                'desa_id' => $desaId,
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertSessionHasErrors('desa_id');
+
+        $this->assertSame(0, Spt::count());
+    }
+
+    public function test_create_desa_id_tidak_ada_ditolak(): void
+    {
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa_id' => 999999,
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertSessionHasErrors('desa_id');
+
+        $this->assertSame(0, Spt::count());
+    }
+
+    public function test_update_desa_mengubah_snapshot(): void
+    {
+        $spt = $this->buatDataDasar();
+        $sppd = $spt->sppds()->first();
+        $juai = Kecamatan::where('nama', 'Juai')->value('id');
+        $galumbang = Desa::where('nama', 'Galumbang')->where('kecamatan_id', $juai)->value('id');
+
+        $this->actingAs($this->admin)
+            ->put(route('form.update', $sppd), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $juai,
+                'desa_id' => $galumbang,
+                'pegawai_ids' => $spt->sppds()->pluck('pegawai_id')->all(),
+            ])
+            ->assertRedirect(route('dalam-daerah'));
+
+        $spt->refresh();
+
+        $this->assertSame($galumbang, $spt->desa_id);
+        $this->assertSame('Galumbang', $spt->desa);
+    }
+
+    public function test_edit_legacy_hydrate_desa_benar(): void
+    {
+        $spt = $this->buatDataDasar();
+        DB::table('spts')->where('id', $spt->id)->update(['desa_id' => null]);
+        $sppd = $spt->sppds()->first();
+
+        $response = $this->actingAs($this->admin)->get(route('form.edit', $sppd));
+
+        $response->assertOk();
+        $this->assertSame(
+            Spt::resolveDesaId($spt->desa, $spt->kecamatan_id),
+            $response->viewData('selectedDesaId')
+        );
+        $this->assertNotNull($response->viewData('selectedDesaId'));
+    }
+
+    public function test_edit_legacy_mismatch_tanpa_tebakan(): void
+    {
+        $spt = $this->buatDataDasar();
+        DB::table('spts')->where('id', $spt->id)->update(['desa_id' => null, 'desa' => 'Desa Fiktif']);
+        $sppd = $spt->sppds()->first();
+
+        $response = $this->actingAs($this->admin)->get(route('form.edit', $sppd));
+
+        $response->assertOk();
+        $this->assertNull($response->viewData('selectedDesaId'));
+    }
+
+    public function test_pdf_tetap_membaca_snapshot_desa(): void
+    {
+        $sumberSpt = file_get_contents(resource_path('views/pdf/spt.blade.php'));
+        $sumberSppd = file_get_contents(resource_path('views/pdf/sppd.blade.php'));
+
+        $this->assertStringContainsString('$spt->desa', $sumberSpt);
+        $this->assertStringContainsString('$spt->desa', $sumberSppd);
+        $this->assertStringNotContainsString('desa->nama', $sumberSpt.$sumberSppd);
+    }
+
     public function test_create_tanpa_pegawai_ditolak(): void
     {
         $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
@@ -288,7 +421,7 @@ class FormControllerTest extends TestCase
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Rapat',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => 'Batu Piring',
+                'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
                 'pegawai_ids' => [],
             ])
             ->assertSessionHasErrors('pegawai_ids');
@@ -429,7 +562,7 @@ class FormControllerTest extends TestCase
             'tanggal_kembali' => '2026-08-15',
             'perihal' => 'Rapat koordinasi',
             'kecamatan_id' => Desa::where('nama', 'Batu Piring')->value('kecamatan_id'),
-            'desa' => 'Batu Piring',
+            'desa_id' => Desa::where('nama', 'Batu Piring')->value('id'),
             'pegawai_ids' => [Pegawai::orderBy('nama')->value('id')],
         ];
     }

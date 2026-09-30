@@ -67,7 +67,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Rapat integrasi data',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect(route('dalam-daerah'));
@@ -124,7 +124,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'User membuat ini',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => $pegawaiIds,
             ])
             ->assertRedirect();
@@ -187,7 +187,7 @@ class SptSppdIntegrationTest extends TestCase
                     'tanggal_kembali' => '2026-08-22',
                     'perihal' => "Perjalanan ke-$i",
                     'kecamatan_id' => $kecamatanId,
-                    'desa' => $desa,
+                    'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                     'pegawai_ids' => $pegawais->pluck('id')->toArray(),
                 ])
                 ->assertRedirect();
@@ -237,7 +237,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'SPT pertama',
                 'kecamatan_id' => $kecamatanId1,
-                'desa' => $desa1,
+                'desa_id' => Desa::where('nama', $desa1)->where('kecamatan_id', $kecamatanId1)->value('id'),
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -250,7 +250,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'SPT kedua',
                 'kecamatan_id' => $kecamatanId2,
-                'desa' => $desa2,
+                'desa_id' => Desa::where('nama', $desa2)->where('kecamatan_id', $kecamatanId2)->value('id'),
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -287,7 +287,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Dalam daerah test',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => [Pegawai::first()->id],
             ]);
 
@@ -351,7 +351,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Sebelum edit',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -476,7 +476,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Tanggal test',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -504,7 +504,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Nomor test',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => $pegawais,
             ]);
 
@@ -529,7 +529,7 @@ class SptSppdIntegrationTest extends TestCase
                 'tanggal_kembali' => '2026-08-22',
                 'perihal' => 'Test relasi',
                 'kecamatan_id' => $kecamatanId,
-                'desa' => $desa,
+                'desa_id' => Desa::where('nama', $desa)->where('kecamatan_id', $kecamatanId)->value('id'),
                 'pegawai_ids' => [Pegawai::first()->id],
             ]);
 

@@ -86,11 +86,11 @@ class SptForm
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(fn (Set $set) => $set('desa', null))
+                    ->afterStateUpdated(fn (Set $set) => $set('desa_id', null))
                     ->visible(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
                     ->required(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah'),
 
-                Select::make('desa')
+                Select::make('desa_id')
                     ->label('Desa/Kelurahan')
                     ->options(function (Get $get): array {
                         $kecamatanId = $get('kecamatan_id');
@@ -100,7 +100,7 @@ class SptForm
 
                         return Desa::where('kecamatan_id', $kecamatanId)
                             ->orderBy('nama')
-                            ->pluck('nama', 'nama')
+                            ->pluck('nama', 'id')
                             ->toArray();
                     })
                     ->searchable()
@@ -109,6 +109,13 @@ class SptForm
                     ->visible(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
                     ->required(fn ($get) => $get('jenis_perjalanan') === 'Dalam Daerah')
                     ->placeholder('Pilih desa/kelurahan')
+                    ->afterStateHydrated(function (Select $component, ?Spt $record) {
+                        if ($record && ! $component->getState() && $record->desa) {
+                            $component->state(
+                                Spt::resolveDesaId($record->desa, $record->kecamatan_id)
+                            );
+                        }
+                    })
                     ->rules([
                         function (Get $get): Closure {
                             return function (string $attribute, $value, Closure $fail) use ($get) {
@@ -119,7 +126,7 @@ class SptForm
                                 if (! $kecamatanId) {
                                     return;
                                 }
-                                $exists = Desa::where('nama', $value)
+                                $exists = Desa::where('id', $value)
                                     ->where('kecamatan_id', $kecamatanId)
                                     ->exists();
                                 if (! $exists) {

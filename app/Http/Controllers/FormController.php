@@ -49,6 +49,7 @@ class FormController extends Controller
                 'perihal' => $validated['perihal'],
                 'dasar' => $validated['dasar'] ?? null,
                 'kecamatan_id' => $this->kecamatanId($validated),
+                'desa_id' => $this->desaId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
                 'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
@@ -83,6 +84,9 @@ class FormController extends Controller
             'selectedPegawaiIds' => $spt
                 ? array_values(array_unique($spt->sppds()->pluck('pegawai_id')->toArray()))
                 : [],
+            'selectedDesaId' => $spt
+                ? ($spt->desa_id ?? ($spt->desa ? Spt::resolveDesaId($spt->desa, $spt->kecamatan_id) : null))
+                : null,
             'editMode' => true,
             'lastPerjalananDinas' => $lastPerjalananDinas,
             'lastSppd' => $lastPerjalananDinas, // alias kompatibilitas
@@ -110,6 +114,7 @@ class FormController extends Controller
                 'perihal' => $validated['perihal'],
                 'dasar' => $validated['dasar'] ?? null,
                 'kecamatan_id' => $this->kecamatanId($validated),
+                'desa_id' => $this->desaId($validated),
                 'desa' => $this->desa($validated),
                 'kota_tujuan_id' => $this->kotaTujuanId($validated),
                 'tempat_kegiatan' => $validated['tempat_kegiatan'] ?? null,
@@ -158,10 +163,10 @@ class FormController extends Controller
                 'exists:kecamatans,id',
                 Rule::requiredIf($dalamDaerah),
             ],
-            'desa' => [
+            'desa_id' => [
                 'nullable',
-                'string',
-                'max:255',
+                'integer',
+                'exists:desas,id',
                 Rule::requiredIf($dalamDaerah),
                 function (string $attribute, mixed $value, \Closure $fail) use ($request) {
                     if ($request->input('jenis_perjalanan') === 'Dalam Daerah' && $value) {
@@ -169,7 +174,7 @@ class FormController extends Controller
                         if (! $kecamatanId) {
                             return;
                         }
-                        $exists = Desa::where('nama', $value)
+                        $exists = Desa::where('id', $value)
                             ->where('kecamatan_id', $kecamatanId)
                             ->exists();
                         if (! $exists) {
@@ -190,7 +195,7 @@ class FormController extends Controller
             'pegawai_ids.min' => 'Pilih minimal satu pegawai yang ditugaskan.',
             'pegawai_ids.*.distinct' => 'Pegawai tidak boleh dipilih lebih dari satu kali.',
             'kecamatan_id.required' => 'Kecamatan wajib dipilih untuk perjalanan dalam daerah.',
-            'desa.required' => 'Desa wajib diisi untuk perjalanan dalam daerah.',
+            'desa_id.required' => 'Desa wajib diisi untuk perjalanan dalam daerah.',
             'kota_tujuan_id.required' => 'Kota tujuan wajib dipilih untuk perjalanan luar daerah.',
         ]);
     }
@@ -202,11 +207,25 @@ class FormController extends Controller
             : null;
     }
 
+    protected function desaRecord(array $validated): ?Desa
+    {
+        if ($validated['jenis_perjalanan'] !== 'Dalam Daerah' || empty($validated['desa_id'])) {
+            return null;
+        }
+
+        return Desa::where('id', $validated['desa_id'])
+            ->where('kecamatan_id', $validated['kecamatan_id'])
+            ->first();
+    }
+
+    protected function desaId(array $validated): ?int
+    {
+        return $this->desaRecord($validated)?->id;
+    }
+
     protected function desa(array $validated): ?string
     {
-        return $validated['jenis_perjalanan'] === 'Dalam Daerah'
-            ? $validated['desa']
-            : null;
+        return $this->desaRecord($validated)?->nama;
     }
 
     protected function kotaTujuanId(array $validated): ?int
