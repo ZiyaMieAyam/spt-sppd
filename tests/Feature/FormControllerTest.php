@@ -161,6 +161,70 @@ class FormControllerTest extends TestCase
         ]);
     }
 
+    public function test_create_tanggal_spt_sebelum_berangkat_valid(): void
+    {
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-11',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => 'Batu Piring',
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertRedirect(route('dalam-daerah'));
+
+        $this->assertSame(1, Spt::count());
+    }
+
+    public function test_create_tanggal_spt_sama_dengan_berangkat_valid(): void
+    {
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-13',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => 'Batu Piring',
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertRedirect(route('dalam-daerah'));
+
+        $this->assertSame(1, Spt::count());
+    }
+
+    public function test_create_tanggal_spt_setelah_berangkat_ditolak(): void
+    {
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-14',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => 'Batu Piring',
+                'pegawai_ids' => [$pegawaiId],
+            ])
+            ->assertSessionHasErrors('tanggal_spt');
+
+        $this->assertSame(0, Spt::count());
+        $this->assertSame(0, Sppd::count());
+    }
+
     public function test_create_tanpa_pegawai_ditolak(): void
     {
         $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');

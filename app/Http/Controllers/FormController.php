@@ -146,7 +146,7 @@ class FormController extends Controller
 
         return $request->validate([
             'jenis_perjalanan' => ['required', 'in:Dalam Daerah,Luar Daerah'],
-            'tanggal_spt' => ['required', 'date'],
+            'tanggal_spt' => ['required', 'date', 'before_or_equal:tanggal_berangkat'],
             'tanggal_berangkat' => ['required', 'date'],
             'tanggal_kembali' => ['required', 'date', 'after_or_equal:tanggal_berangkat'],
             'perihal' => ['required', 'string'],
@@ -185,6 +185,7 @@ class FormController extends Controller
             ],
             'tempat_kegiatan' => ['nullable', 'string', 'max:255'],
         ], [
+            'tanggal_spt.before_or_equal' => 'Tanggal SPT tidak boleh setelah tanggal berangkat.',
             'pegawai_ids.required' => 'Pilih minimal satu pegawai yang ditugaskan.',
             'pegawai_ids.min' => 'Pilih minimal satu pegawai yang ditugaskan.',
             'pegawai_ids.*.distinct' => 'Pegawai tidak boleh dipilih lebih dari satu kali.',

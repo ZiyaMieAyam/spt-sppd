@@ -37,7 +37,8 @@ class SptForm
 
                 DatePicker::make('tanggal_spt')
                     ->label('Tanggal SPT')
-                    ->required(),
+                    ->required()
+                    ->beforeOrEqual('tanggal_berangkat'),
 
                 DatePicker::make('tanggal_berangkat')
                     ->label('Tanggal Berangkat')
