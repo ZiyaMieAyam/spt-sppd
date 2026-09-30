@@ -37,8 +37,7 @@ class SppdPdfController extends Controller
             'pegawai' => $sppd->pegawai,
             'lamaHari' => $lamaHari,
             'penandatangan' => $penandatangan,
-            'pathKop' => '',
-            'adaGambarKop' => false,
+            ...$this->variabelKop($penandatangan),
         ]);
 
         $pdf->setPaper('A4', 'portrait');
@@ -48,5 +47,15 @@ class SppdPdfController extends Controller
         $dompdf->set_option('chroot', public_path());
 
         return $pdf->stream('SPPD-'.$sppd->id.'.pdf');
+    }
+
+    private function variabelKop(array $penandatangan): array
+    {
+        $pathKop = PenandatanganService::pathKop((string) ($penandatangan['kop'] ?? ''));
+
+        return [
+            'pathKop' => $pathKop,
+            'adaGambarKop' => $pathKop !== '' && is_file($pathKop),
+        ];
     }
 }
