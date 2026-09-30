@@ -3,9 +3,9 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\PerjalananDinasController;
 use App\Http\Controllers\SppdPdfController;
 use App\Http\Controllers\SptPdfController;
-use App\Models\Sppd;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [
@@ -30,49 +30,15 @@ Route::middleware('auth')->group(function () {
         'index',
     ])->name('beranda');
 
-    Route::get('/dalam-daerah', function () {
+    Route::get('/dalam-daerah', [
+        PerjalananDinasController::class,
+        'dalamDaerah',
+    ])->name('dalam-daerah');
 
-        $data = Sppd::with([
-            'spt.kecamatan',
-            'pegawai',
-        ])
-            ->whereHas('spt', function ($query) {
-                $query->where(
-                    'jenis_perjalanan',
-                    'Dalam Daerah'
-                );
-            })
-            ->orderBy('spt_id', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        return view('dalam-daerah', [
-            'data' => $data,
-        ]);
-
-    })->name('dalam-daerah');
-
-    Route::get('/luar-daerah', function () {
-
-        $data = Sppd::with([
-            'spt.kotaTujuan',
-            'pegawai',
-        ])
-            ->whereHas('spt', function ($query) {
-                $query->where(
-                    'jenis_perjalanan',
-                    'Luar Daerah'
-                );
-            })
-            ->orderBy('spt_id', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        return view('luar-daerah', [
-            'data' => $data,
-        ]);
-
-    })->name('luar-daerah');
+    Route::get('/luar-daerah', [
+        PerjalananDinasController::class,
+        'luarDaerah',
+    ])->name('luar-daerah');
 
     // FORM CRUD
 

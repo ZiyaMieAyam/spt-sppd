@@ -43,7 +43,7 @@
 
                         <tr>
 
-                            <td class="col-no">{{ $index + 1 }}</td>
+                            <td class="col-no">{{ ($data->firstItem() ?? 0) + $index }}</td>
 
                             <td>{{ $item->spt?->nomor_spt ?? '-' }}</td>
 
@@ -121,6 +121,12 @@
             </table>
 
         </div>
+
+        @if ($data->hasPages())
+            <div class="pagination-wrapper">
+                {{ $data->links() }}
+            </div>
+        @endif
 
     </div>
 
@@ -263,6 +269,11 @@
         .btn-delete:hover {
             background: #fee2e2;
             border-color: #fca5a5;
+        }
+
+        .pagination-wrapper {
+            padding: 16px 25px;
+            border-top: 1px solid #e5e7eb;
         }
     </style>
 @endpush
