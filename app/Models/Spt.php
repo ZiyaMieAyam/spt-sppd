@@ -17,6 +17,7 @@ class Spt extends Model
         'dasar',
         'kecamatan_id',
         'desa',
+        'desa_id',
         'kota_tujuan_id',
         'tempat_kegiatan',
     ];
@@ -30,6 +31,19 @@ class Spt extends Model
     public function kecamatan()
     {
         return $this->belongsTo(Kecamatan::class);
+    }
+
+    /**
+     * Relasi master desa (tahap 1, opsional).
+     *
+     * Catatan: kolom string `desa` masih ada, sehingga akses properti
+     * `$spt->desa` mengembalikan string historis. Relasi dipakai via
+     * `$spt->desa()->...` atau `$spt->load('desa')` + `getRelation('desa')`,
+     * atau via properti setelah kolom string dihapus di tahap berikutnya.
+     */
+    public function desa()
+    {
+        return $this->belongsTo(Desa::class, 'desa_id');
     }
 
     public function kotaTujuan()
@@ -50,6 +64,38 @@ class Spt extends Model
             'spt_id',
             'pegawai_id'
         );
+    }
+
+    protected static function booted(): void
+    {
+        // Tahap 1: isi desa_id otomatis HANYA bila cocok persis
+        // (nama + kecamatan_id). Tidak menimpa desa_id yang sudah ada
+        // kecuali desa/kecamatan berubah; tidak mengubah string `desa`.
+        static::saving(function (Spt $spt): void {
+            if (! $spt->isDirty('desa') && ! $spt->isDirty('kecamatan_id') && ! empty($spt->getAttributeFromArray('desa_id'))) {
+                return;
+            }
+
+            $spt->desa_id = $spt->desa && $spt->kecamatan_id
+                ? self::resolveDesaId($spt->desa, (int) $spt->kecamatan_id)
+                : null;
+        });
+    }
+
+    /**
+     * Cari id master desa dengan pencocokan TEPAT (nama + kecamatan).
+     * Tanpa fuzzy matching: tidak cocok => null.
+     */
+    public static function resolveDesaId(?string $nama, ?int $kecamatanId): ?int
+    {
+        if ($nama === null || $nama === '' || $kecamatanId === null) {
+            return null;
+        }
+
+        return Desa::query()
+            ->where('kecamatan_id', $kecamatanId)
+            ->where('nama', $nama)
+            ->value('id');
     }
 
     public static function generateNomorSpt(Carbon|string|null $tanggal = null): string
