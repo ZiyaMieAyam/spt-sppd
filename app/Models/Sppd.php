@@ -30,21 +30,6 @@ class Sppd extends Model
         return $this->belongsTo(Pegawai::class);
     }
 
-    public static function generateNomorSppd(string $kode): string
-    {
-        $urutan = self::nomorBerikutnya();
-
-        return self::formatNomorSppd($kode, $urutan);
-    }
-
-    public static function nomorBerikutnya(Carbon|string|null $tanggal = null): int
-    {
-        $tanggal = Carbon::parse($tanggal ?? now());
-
-        // Counter 'sppd' per tahun, terpisah dari counter 'spt'.
-        return NomorUrut::reserveNext(NomorUrut::JENIS_SPPD, $tanggal->year);
-    }
-
     /**
      * Reservasi satu blok nomor SPPD sekaligus (satu SPT bisa untuk
      * beberapa pegawai). Mengembalikan nomor pertama; pemanggil

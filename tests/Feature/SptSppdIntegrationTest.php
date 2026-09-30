@@ -153,7 +153,7 @@ class SptSppdIntegrationTest extends TestCase
         Sppd::create([
             'spt_id' => $sptAdmin->id,
             'pegawai_id' => $pegawai->id,
-            'nomor_sppd' => Sppd::generateNomorSppd($pegawai->kode_sppd),
+            'nomor_sppd' => Sppd::formatNomorSppd($pegawai->kode_sppd, Sppd::reserveNomorBlok(1)),
             'tanggal_berangkat' => '2026-08-25',
             'tanggal_kembali' => '2026-08-27',
         ]);
@@ -414,7 +414,7 @@ class SptSppdIntegrationTest extends TestCase
         Sppd::create([
             'spt_id' => $spt->id,
             'pegawai_id' => $pegawai->id,
-            'nomor_sppd' => Sppd::generateNomorSppd($pegawai->kode_sppd),
+            'nomor_sppd' => Sppd::formatNomorSppd($pegawai->kode_sppd, Sppd::reserveNomorBlok(1)),
             'tanggal_berangkat' => '2026-08-20',
             'tanggal_kembali' => '2026-08-22',
         ]);

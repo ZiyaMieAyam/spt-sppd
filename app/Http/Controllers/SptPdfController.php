@@ -33,7 +33,7 @@ class SptPdfController extends Controller
 
     public function generate(Request $request, Spt $spt)
     {
-        [$definisi, $kunci] = $this->resolusiPenandatangan($request, $spt);
+        [$definisi, $kunci] = $this->resolusiPenandatangan($request);
 
         if ($definisi === null) {
             return $this->redirectBelumPilih($spt);
@@ -68,7 +68,7 @@ class SptPdfController extends Controller
         );
     }
 
-    private function resolusiPenandatangan(Request $request, Spt|Sppd $dokumen): array
+    private function resolusiPenandatangan(Request $request): array
     {
         $kunci = $request->query('penandatangan');
 
