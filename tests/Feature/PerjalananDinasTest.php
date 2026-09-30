@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\PerjalananDinasController;
 use App\Models\Desa;
 use App\Models\Kecamatan;
@@ -27,7 +28,7 @@ class PerjalananDinasTest extends TestCase
 
         $this->seed();
 
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->admin = User::factory()->create(['role' => UserRole::Admin]);
     }
 
     public function test_dalam_daerah_membutuhkan_auth(): void

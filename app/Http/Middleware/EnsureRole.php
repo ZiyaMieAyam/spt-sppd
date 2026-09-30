@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,11 @@ class EnsureRole
     {
         $user = $request->user();
 
-        if (! $user || ! in_array($user->role, $roles)) {
+        $role = $user?->role instanceof UserRole
+            ? $user->role->value
+            : (string) $user?->role;
+
+        if (! $user || ! in_array($role, $roles)) {
             abort(403, 'Akses ditolak.');
         }
 

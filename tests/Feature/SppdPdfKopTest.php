@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\SppdPdfController;
 use App\Models\Desa;
 use App\Models\Kecamatan;
@@ -91,7 +92,7 @@ class SppdPdfKopTest extends TestCase
 
     public function test_sppd_pdf_tetap_terender_tanpa_aset_kop_resmi(): void
     {
-        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+        $admin = \App\Models\User::factory()->create(['role' => UserRole::Admin]);
         $spt = $this->buatDataDasar();
         $sppd = $spt->sppds()->firstOrFail();
 

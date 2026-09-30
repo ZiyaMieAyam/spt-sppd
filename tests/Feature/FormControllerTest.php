@@ -8,6 +8,7 @@ use App\Models\KotaTujuan;
 use App\Models\Pegawai;
 use App\Models\Sppd;
 use App\Models\Spt;
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -25,7 +26,7 @@ class FormControllerTest extends TestCase
         $this->seed();
 
         // User khusus test agar tidak bergantung pada kredensial/urutan seed.
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->admin = User::factory()->create(['role' => UserRole::Admin]);
     }
 
     public function test_halaman_form_tampil(): void
@@ -225,6 +226,56 @@ class FormControllerTest extends TestCase
         $this->assertSame(0, Sppd::count());
     }
 
+    public function test_create_perihal_valid_diterima(): void
+    {
+        $payload = $this->payloadDalamDaerah();
+        $payload['perihal'] = str_repeat('a', 500);
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), $payload)
+            ->assertRedirect(route('dalam-daerah'));
+
+        $this->assertSame(1, Spt::count());
+    }
+
+    public function test_create_perihal_melebihi_batas_ditolak(): void
+    {
+        $payload = $this->payloadDalamDaerah();
+        $payload['perihal'] = str_repeat('a', 501);
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), $payload)
+            ->assertSessionHasErrors('perihal');
+
+        $this->assertSame(0, Spt::count());
+        $this->assertSame(0, Sppd::count());
+    }
+
+    public function test_create_dasar_valid_diterima(): void
+    {
+        $payload = $this->payloadDalamDaerah();
+        $payload['dasar'] = str_repeat('b', 2000);
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), $payload)
+            ->assertRedirect(route('dalam-daerah'));
+
+        $this->assertSame(1, Spt::count());
+    }
+
+    public function test_create_dasar_melebihi_batas_ditolak(): void
+    {
+        $payload = $this->payloadDalamDaerah();
+        $payload['dasar'] = str_repeat('b', 2001);
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), $payload)
+            ->assertSessionHasErrors('dasar');
+
+        $this->assertSame(0, Spt::count());
+        $this->assertSame(0, Sppd::count());
+    }
+
     public function test_create_tanpa_pegawai_ditolak(): void
     {
         $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
@@ -345,7 +396,7 @@ class FormControllerTest extends TestCase
     public function test_delete_spt_ditolak_untuk_non_admin(): void
     {
         $spt = $this->buatDataDasar();
-        $nonAdmin = User::factory()->create(['role' => 'user']);
+        $nonAdmin = User::factory()->create(['role' => UserRole::User]);
 
         $this->actingAs($nonAdmin)
             ->delete(route('form.delete', $spt))
@@ -367,6 +418,20 @@ class FormControllerTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('luar-daerah'))
             ->assertOk();
+    }
+
+    protected function payloadDalamDaerah(): array
+    {
+        return [
+            'jenis_perjalanan' => 'Dalam Daerah',
+            'tanggal_spt' => '2026-08-12',
+            'tanggal_berangkat' => '2026-08-13',
+            'tanggal_kembali' => '2026-08-15',
+            'perihal' => 'Rapat koordinasi',
+            'kecamatan_id' => Desa::where('nama', 'Batu Piring')->value('kecamatan_id'),
+            'desa' => 'Batu Piring',
+            'pegawai_ids' => [Pegawai::orderBy('nama')->value('id')],
+        ];
     }
 
     protected function buatDataDasar(): Spt

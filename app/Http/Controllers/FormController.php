@@ -149,8 +149,8 @@ class FormController extends Controller
             'tanggal_spt' => ['required', 'date', 'before_or_equal:tanggal_berangkat'],
             'tanggal_berangkat' => ['required', 'date'],
             'tanggal_kembali' => ['required', 'date', 'after_or_equal:tanggal_berangkat'],
-            'perihal' => ['required', 'string'],
-            'dasar' => ['nullable', 'string'],
+            'perihal' => ['required', 'string', 'max:500'],
+            'dasar' => ['nullable', 'string', 'max:2000'],
             'pegawai_ids' => ['required', 'array', 'min:1'],
             'pegawai_ids.*' => ['integer', 'exists:pegawais,id', 'distinct'],
             'kecamatan_id' => [

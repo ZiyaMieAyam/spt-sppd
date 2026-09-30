@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +18,7 @@ class UserSeeder extends Seeder
             ['email' => env('SEED_USER_EMAIL', 'zia@zia.com')],
             [
                 'name' => 'zia',
-                'role' => 'user',
+                'role' => UserRole::User,
                 'password' => Hash::make(env('SEED_USER_PASSWORD', '12345')),
             ]
         );

@@ -70,11 +70,13 @@ class SptForm
                     ->label('Perihal')
                     ->rows(3)
                     ->required()
+                    ->maxLength(500)
                     ->columnSpanFull(),
 
                 Textarea::make('dasar')
                     ->label('Dasar')
                     ->rows(3)
+                    ->maxLength(2000)
                     ->placeholder("Contoh:\n1. Peraturan Bupati Balangan Nomor ... Tahun ...\n2. Keputusan Bupati Balangan Nomor ... Tahun ...")
                     ->columnSpanFull(),
 

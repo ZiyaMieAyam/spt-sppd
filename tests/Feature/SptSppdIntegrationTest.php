@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
 use App\Models\Desa;
 use App\Models\Kecamatan;
 use App\Models\KotaTujuan;
@@ -26,7 +27,7 @@ class SptSppdIntegrationTest extends TestCase
         $this->seed();
 
         // User khusus test agar tidak bergantung pada kredensial/urutan seed.
-        $this->admin = User::factory()->create(['role' => 'admin']);
+        $this->admin = User::factory()->create(['role' => UserRole::Admin]);
     }
 
     protected function kecamatanDesa(string $namaDesa): array
