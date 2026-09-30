@@ -80,6 +80,8 @@ class FormControllerTest extends TestCase
 
     public function test_create_luar_daerah_tanpa_kota_tujuan_ditolak(): void
     {
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+
         $this->actingAs($this->admin)
             ->post(route('form.simpan'), [
                 'jenis_perjalanan' => 'Luar Daerah',
@@ -87,12 +89,76 @@ class FormControllerTest extends TestCase
                 'tanggal_berangkat' => '2026-08-13',
                 'tanggal_kembali' => '2026-08-15',
                 'perihal' => 'Bimtek',
-                'pegawai_ids' => [5],
+                'pegawai_ids' => [$pegawaiId],
             ])
             ->assertSessionHasErrors('kota_tujuan_id');
 
         $this->assertSame(0, Spt::count());
         $this->assertSame(0, Sppd::count());
+    }
+
+    public function test_create_duplicate_pegawai_ditolak(): void
+    {
+        $pegawaiId = Pegawai::orderBy('nama')->value('id');
+        $kecamatanId = Desa::where('nama', 'Batu Piring')->value('kecamatan_id');
+
+        $this->actingAs($this->admin)
+            ->post(route('form.simpan'), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi kecamatan',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => 'Batu Piring',
+                'pegawai_ids' => [$pegawaiId, $pegawaiId],
+            ])
+            ->assertSessionHasErrors('pegawai_ids.1');
+
+        $this->assertSame(0, Spt::count());
+        $this->assertSame(0, Sppd::count());
+    }
+
+    public function test_update_duplicate_pegawai_ditolak(): void
+    {
+        $spt = $this->buatDataDasar();
+        $sppd = $spt->sppds()->first();
+        $pegawaiId = $spt->sppds()->value('pegawai_id');
+        $kecamatanId = $spt->kecamatan_id;
+        $jumlahSptSebelum = Spt::count();
+        $jumlahSppdSebelum = Sppd::count();
+
+        $this->actingAs($this->admin)
+            ->put(route('form.update', $sppd), [
+                'jenis_perjalanan' => 'Dalam Daerah',
+                'tanggal_spt' => '2026-08-12',
+                'tanggal_berangkat' => '2026-08-13',
+                'tanggal_kembali' => '2026-08-15',
+                'perihal' => 'Rapat koordinasi',
+                'kecamatan_id' => $kecamatanId,
+                'desa' => $spt->desa,
+                'pegawai_ids' => [$pegawaiId, $pegawaiId],
+            ])
+            ->assertSessionHasErrors('pegawai_ids.1');
+
+        $this->assertSame($jumlahSptSebelum, Spt::count());
+        $this->assertSame($jumlahSppdSebelum, Sppd::count());
+    }
+
+    public function test_unique_spt_pegawai_menolak_duplikat_di_database(): void
+    {
+        $spt = $this->buatDataDasar();
+        $baris = $spt->sppds()->firstOrFail();
+
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        Sppd::create([
+            'spt_id' => $baris->spt_id,
+            'pegawai_id' => $baris->pegawai_id,
+            'nomor_sppd' => '999.9/999/DISCOMINFOSAN-BLG/VIII/2026',
+            'tanggal_berangkat' => '2026-08-13',
+            'tanggal_kembali' => '2026-08-15',
+        ]);
     }
 
     public function test_create_tanpa_pegawai_ditolak(): void
