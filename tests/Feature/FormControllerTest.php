@@ -226,15 +226,69 @@ class FormControllerTest extends TestCase
     public function test_delete_menghapus_spt_beserta_sppd(): void
     {
         $spt = $this->buatDataDasar();
-        $sppd = $spt->sppds()->first();
         $sptId = $spt->id;
+        $this->assertSame(3, $spt->sppds()->count());
 
         $this->actingAs($this->admin)
-            ->delete(route('form.delete', $sppd))
-            ->assertRedirect();
+            ->delete(route('form.delete', $spt))
+            ->assertRedirect()
+            ->assertSessionHas('success', 'SPT dan seluruh SPPD terkait berhasil dihapus.');
 
         $this->assertNull(Spt::find($sptId));
         $this->assertSame(0, Sppd::where('spt_id', $sptId)->count());
+    }
+
+    public function test_delete_spt_tidak_menghapus_spt_lain(): void
+    {
+        $sptLain = $this->buatDataDasar();
+        $pegawaiLain = Pegawai::whereNotIn('id', $sptLain->sppds()->pluck('pegawai_id'))->orderBy('nama')->firstOrFail();
+        $kecamatanId = Kecamatan::where('nama', 'Awayan')->value('id');
+        $desa = Desa::where('kecamatan_id', $kecamatanId)->orderBy('nama')->value('nama');
+
+        $sptBaru = Spt::create([
+            'jenis_perjalanan' => 'Dalam Daerah',
+            'nomor_spt' => Spt::generateNomorSpt('2026-08-12'),
+            'tanggal_spt' => '2026-08-12',
+            'tanggal_berangkat' => '2026-08-13',
+            'tanggal_kembali' => '2026-08-15',
+            'perihal' => 'Rapat lain',
+            'kecamatan_id' => $kecamatanId,
+            'desa' => $desa,
+            'kota_tujuan_id' => null,
+        ]);
+
+        Sppd::create([
+            'spt_id' => $sptBaru->id,
+            'pegawai_id' => $pegawaiLain->id,
+            'nomor_sppd' => $pegawaiLain->kode_sppd.'/900/DISCOMINFOSAN-BLG/VIII/2026',
+            'tanggal_berangkat' => '2026-08-13',
+            'tanggal_kembali' => '2026-08-15',
+        ]);
+
+        $sptLainId = $sptLain->id;
+        $sptBaruId = $sptBaru->id;
+
+        $this->actingAs($this->admin)
+            ->delete(route('form.delete', $sptLain))
+            ->assertRedirect();
+
+        $this->assertNull(Spt::find($sptLainId));
+        $this->assertSame(0, Sppd::where('spt_id', $sptLainId)->count());
+        $this->assertNotNull(Spt::find($sptBaruId));
+        $this->assertSame(1, Sppd::where('spt_id', $sptBaruId)->count());
+    }
+
+    public function test_delete_spt_ditolak_untuk_non_admin(): void
+    {
+        $spt = $this->buatDataDasar();
+        $nonAdmin = User::factory()->create(['role' => 'user']);
+
+        $this->actingAs($nonAdmin)
+            ->delete(route('form.delete', $spt))
+            ->assertForbidden();
+
+        $this->assertNotNull(Spt::find($spt->id));
+        $this->assertSame(3, Sppd::where('spt_id', $spt->id)->count());
     }
 
     public function test_halaman_daftar_menampilkan_data(): void

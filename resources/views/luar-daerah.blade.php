@@ -38,6 +38,7 @@
 
                 <tbody>
 
+                    @php($sptIdTerakhir = null)
                     @forelse ($data as $index => $item)
 
                         <tr>
@@ -81,6 +82,17 @@
                                         </svg>
                                         Cetak SPPD
                                     </a>
+
+                                    @if (auth()->user()?->isAdmin() && $item->spt && $item->spt->id !== $sptIdTerakhir)
+                                        <form action="{{ route('form.delete', $item->spt->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Yakin ingin menghapus SPT ini beserta seluruh SPPD yang terkait?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn-delete" title="Hapus SPT beserta seluruh SPPD">
+                                                Hapus SPT
+                                            </button>
+                                        </form>
+                                    @endif
+                                    @php($sptIdTerakhir = $item->spt?->id)
 
                                 </div>
 
@@ -221,6 +233,26 @@
         .btn-sppd:hover {
             background: #dcfce7;
             border-color: #86efac;
+        }
+
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
         }
     </style>
 @endpush

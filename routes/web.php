@@ -98,9 +98,9 @@ Route::middleware('auth')->group(function () {
             'update',
         ])->name('form.update');
 
-        Route::delete('/form/{sppd}', [
+        Route::delete('/form/spt/{spt}', [
             FormController::class,
-            'destroy',
+            'destroySpt',
         ])->name('form.delete');
 
     });

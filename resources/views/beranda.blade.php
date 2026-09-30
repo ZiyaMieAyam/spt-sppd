@@ -174,6 +174,15 @@
                                     </svg>
                                     Cetak PDF
                                 </a>
+                                @if (auth()->user()?->isAdmin())
+                                    <form action="{{ route('form.delete', $spt->id) }}" method="POST" style="display:inline;margin-left:8px" onsubmit="return confirm('Yakin ingin menghapus SPT ini beserta seluruh SPPD yang terkait?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete" title="Hapus SPT beserta seluruh SPPD">
+                                            Hapus SPT
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
 
                         </tr>
@@ -539,6 +548,26 @@
         .btn-print:hover {
             background: #dbeafe;
             border-color: #93c5fd;
+        }
+
+        .btn-delete {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
         }
 
         .quick-head {

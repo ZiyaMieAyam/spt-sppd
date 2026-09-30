@@ -381,11 +381,10 @@ class SptSppdIntegrationTest extends TestCase
         $this->assertSame(2, $spt->sppds()->count());
 
         // Delete via User
-        $sppdFirst = $spt->sppds()->first();
         $sptId = $spt->id;
 
         $this->actingAs($this->admin)
-            ->delete(route('form.delete', $sppdFirst))
+            ->delete(route('form.delete', $spt))
             ->assertRedirect();
 
         $this->assertNull(Spt::find($sptId));

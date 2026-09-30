@@ -129,20 +129,14 @@ class FormController extends Controller
             ->with('success', 'Data berhasil diperbarui.');
     }
 
-    public function destroy(Sppd $sppd)
+    public function destroySpt(Spt $spt)
     {
-        DB::transaction(function () use ($sppd) {
-            $spt = $sppd->spt;
-
-            if ($spt) {
-                $spt->sppds()->delete();
-                $spt->delete();
-            } else {
-                $sppd->delete();
-            }
+        DB::transaction(function () use ($spt) {
+            $spt->sppds()->delete();
+            $spt->delete();
         });
 
-        return back()->with('success', 'Data berhasil dihapus.');
+        return back()->with('success', 'SPT dan seluruh SPPD terkait berhasil dihapus.');
     }
 
     protected function validatedData(Request $request): array
