@@ -24,15 +24,20 @@ class SppdPdfKopTest extends TestCase
         $this->seed();
     }
 
-    public function test_kop_sppd_tetap_sekda(): void
+    public function test_kop_sppd_memakai_diskominfo(): void
     {
         $html = view('pdf.partials.kop', [
-            'penandatangan' => ['kop' => 'sekda'],
-            'pathKop' => PenandatanganService::pathKop('sekda'),
+            'penandatangan' => ['kop' => 'diskominfo'],
+            'pathKop' => PenandatanganService::pathKop('diskominfo'),
             'adaGambarKop' => false,
         ])->render();
 
-        $this->assertStringContainsString('SEKRETARIAT DAERAH', $html);
+        $this->assertStringContainsString('DINAS KOMUNIKASI INFORMATIKA', $html);
+        $this->assertStringContainsString('STATISTIK DAN PERSANDIAN', $html);
+
+        $sumber = file_get_contents(app_path('Http/Controllers/SppdPdfController.php'));
+
+        $this->assertStringContainsString("\$penandatangan['kop'] = 'diskominfo'", $sumber);
     }
 
     public function test_pathkop_tidak_lagi_hardcoded_kosong(): void
@@ -40,21 +45,21 @@ class SppdPdfKopTest extends TestCase
         $method = new \ReflectionMethod(SppdPdfController::class, 'variabelKop');
         $method->setAccessible(true);
 
-        $hasil = $method->invoke(new SppdPdfController, ['kop' => 'sekda']);
+        $hasil = $method->invoke(new SppdPdfController, ['kop' => 'diskominfo']);
 
-        $this->assertSame(public_path('images/kop-sekda.png'), $hasil['pathKop']);
+        $this->assertSame(public_path('images/kop-diskominfo.png'), $hasil['pathKop']);
         $this->assertNotSame('', $hasil['pathKop']);
     }
 
     public function test_adagambarkop_false_selama_file_belum_tersedia(): void
     {
-        $pathKop = PenandatanganService::pathKop('sekda');
+        $pathKop = PenandatanganService::pathKop('diskominfo');
 
         $this->assertFileDoesNotExist($pathKop);
 
         $method = new \ReflectionMethod(SppdPdfController::class, 'variabelKop');
         $method->setAccessible(true);
-        $hasil = $method->invoke(new SppdPdfController, ['kop' => 'sekda']);
+        $hasil = $method->invoke(new SppdPdfController, ['kop' => 'diskominfo']);
 
         $this->assertFalse($hasil['adaGambarKop']);
     }
@@ -62,12 +67,12 @@ class SppdPdfKopTest extends TestCase
     public function test_fallback_teks_digunakan_selama_gambar_belum_tersedia(): void
     {
         $html = view('pdf.partials.kop', [
-            'penandatangan' => ['kop' => 'sekda'],
-            'pathKop' => PenandatanganService::pathKop('sekda'),
+            'penandatangan' => ['kop' => 'diskominfo'],
+            'pathKop' => PenandatanganService::pathKop('diskominfo'),
             'adaGambarKop' => false,
         ])->render();
 
-        $this->assertStringContainsString('SEKRETARIAT DAERAH', $html);
+        $this->assertStringContainsString('DINAS KOMUNIKASI INFORMATIKA', $html);
         $this->assertStringNotContainsString('kop-gambar', $html);
     }
 
